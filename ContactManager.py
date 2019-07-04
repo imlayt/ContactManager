@@ -121,11 +121,11 @@ def db_connection(db_file):
         return None
 
 
-def fillscreen(window, companiid=0, contactid=0):
+def fillscreen(window, companyid=0, contactid=0):
     '''
 
     :param window:
-    :param companiid=0: zero means return the first company (for startup and following deletions)
+    :param companyid=0: zero means return the first company (for startup and following deletions)
     :param contactid=0: zero means return the first contact (for startup and following deletions)
     :return:
     '''
@@ -155,6 +155,11 @@ def main():
     :return:
     '''
 
+    contactlist = []
+    companylist = []
+    contactloglist = []
+
+
     if validatedatafile(my_db_file):
         conn = db_connection(my_db_file)
     else:
@@ -174,47 +179,95 @@ def main():
     # PySimpleGUI form layout
     mainscreencolumn1 = []
 
-    tab2column1_layout = [[sg.Text('Contact Details', background_color='#d2d2df', justification='center', size=(25, 1))],
-            [sg.Text('Name', justification='right', size=(20,1)), sg.InputText(key='_CONTACTNAME_')],
-            [sg.Text('Email', justification='right', size=(20, 1)), sg.InputText(key='_EMAIL_')],
-            [sg.Text('Phone Number', justification='right', size=(20, 1)), sg.InputText(key='_PHONE_')],
-            [sg.Text('Company', justification='right', size=(20, 1)), sg.InputText(key='_COMPANYNAME_')],
-            [sg.Button('Edit', key='_EDITBUTTON_', disabled=True), sg.Button('New', key='_NEWBUTTON_', disabled=False)]]
+    contacttabcol1_layout = [[sg.Listbox(contactlist, size=(40, 15))],
+                             [sg.Button('New Contact', key='_NEWCONTACT_')]
+                             ]
 
-    tab2column2_layout = [[sg.Text('Contact Details', background_color='#d2d2df', justification='center', size=(25, 1))],
-            [sg.Text('Name', justification='right', size=(20,1)), sg.InputText(key='_CONTACTNAME_')],
-            [sg.Text('Email', justification='right', size=(20, 1)), sg.InputText(key='_EMAIL_')],
-            [sg.Text('Phone Number', justification='right', size=(20, 1)), sg.InputText(key='_PHONE_')],
-            [sg.Text('Company', justification='right', size=(20, 1)), sg.InputText(key='_COMPANYNAME_')],
-            [sg.Button('Edit', key='_EDITBUTTON_', disabled=True), sg.Button('New', key='_NEWBUTTON_', disabled=False)]]
+    contacttabcol2_layout = [[sg.Text('Contact Details', background_color='#d2d2df', justification='center', size=(60, 1))],
+                             [sg.Text('Name', justification='right', size=(20,1)), sg.InputText(key='_CONTACTNAME_', size=(40, 1))],
+                             [sg.Text('Last Name', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTLASTNAME_', size=(40, 1))],
+                             [sg.Text('First Name', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTFIRSTNAME_', size=(40, 1))],
+                             [sg.Text('Job Title', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTJOBTITLE_', size=(40, 1))],
+                             [sg.Text('Company', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTCOMPANY_', size=(40, 1))],
+                             [sg.Text('Work Phone', justification='right', size=(20, 1)), sg.InputText(key='_WORKPHONE_', size=(40, 1))],
+                             [sg.Text('Cell Phone', justification='right', size=(20, 1)), sg.InputText(key='_CELLPHONE_', size=(40, 1))],
+                             [sg.Text('Work Email', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTWORKEMAIL_', size=(40, 1))],
+                             [sg.Text('Personal Email', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTPERSONALEMAIL_', size=(40, 1))],
+                             [sg.Text('Picture', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTPICTURE_', size=(40, 1))],
+                             [sg.Text('Last Updated', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTLASTUPDATED_', size=(40, 1))],
+                             [sg.Text('Notes', justification='right', size=(20, 1)),
+                              sg.Multiline(key='_CONTACTNOTES_', size=(40, 10))],
+                             ]
 
-    tab3column1_layout = [[sg.Text('Contact Details', background_color='#d2d2df', justification='center', size=(25, 1))],
-            [sg.Text('Name', justification='right', size=(20,1)), sg.InputText(key='_CONTACTNAME_')],
-            [sg.Text('Email', justification='right', size=(20, 1)), sg.InputText(key='_EMAIL_')],
-            [sg.Text('Phone Number', justification='right', size=(20, 1)), sg.InputText(key='_PHONE_')],
-            [sg.Text('Company', justification='right', size=(20, 1)), sg.InputText(key='_COMPANYNAME_')],
-            [sg.Button('Edit', key='_EDITBUTTON_', disabled=True), sg.Button('New', key='_NEWBUTTON_', disabled=False)]]
+    Actionitemlisttabcol1_layout = [[sg.Listbox(contactlist, size=(40, 15))],
+                             [sg.Button('New Action Item', key='_NEWACTIONITEM_')]
+                             ]
 
-    tab2_layout = [[sg.Column(tab2column1_layout, background_color=mediumgreen),
-                    sg.Column(tab2column2_layout, background_color=mediumgreen)]]
+    Actionitemlisttabcol2_layout = [[sg.T('Company', size=(25, 1)), sg.In(key='_ACTIONITEMLISTCOMPANYNAME_', size=(40, 1))],
+                        [sg.T('Created', size=(25, 1)), sg.In(key='_ACTIONITEMLISTCREATED_', size=(40, 1))],
+                         [sg.T('Due Date', size=(25, 1)), sg.In(key='ACTIONITEMLISTDUEDATE', size=(40, 1))],
+                         [sg.T('Status', size=(25, 1)), sg.In(key='_ACTIONITEMLISTSTATUS_', size=(40, 1))],
+                         [sg.T('Status Date', size=(25, 1)), sg.In(key='_ACTIONITEMLISTSTATUSDATE_', size=(40, 1))],
+                        [sg.T('Action Item', size=(10, 1)),
+                        sg.Multiline(key='_ACTIONITEMLISTACTIONITEM_', size=(55, 10))],
+                        [sg.T('Notes', size=(10, 1)), sg.Multiline(key='_ACTIONITEMLISTNOTES_', size=(55, 10))],
+                         ]
 
-    tab1_layout = [[sg.T('This is inside tab 1')], [sg.In(key='in')]]
+    contactlogtabcol1_layout = [[sg.Listbox(contactloglist, size=(40, 15))],
+                             [sg.Button('New Contact Log Item', key='_NEWCONTACTLOGITETM_')]
+                             ]
 
-    tab3_layout = [[sg.Column(tab3column1_layout, background_color=mediumgreen)]]
+    contactlogtabcol2_layout = [[sg.T('Company', size=(25, 1)), sg.In(key='_ACTIONITEMLISTCOMPANYNAME_', size=(40, 1))],
+                        [sg.T('Company', size=(25, 1)), sg.In(key='_CONTACTLOGCOMPANY_', size=(40, 1))],
+                         [sg.T('Contact', size=(25, 1)), sg.In(key='_CONTACTLOGCONTACT_', size=(40, 1))],
+                         [sg.T('Date/Time', size=(25, 1)), sg.In(key='_CONTACTLOGDATETIME_', size=(40, 1))],
+                         [sg.T('Purpose', size=(25, 1)), sg.In(key='_CONTACTLOGPURPOSE_', size=(40, 1))],
+                        [sg.T('Outcome', size=(10, 1)), sg.In(key='_CONTACTLOGOUTCOME_', size=(55, 10))],
+                        [sg.T('Follow Up', size=(10, 1)), sg.Multiline(key='_CONTACTLOGFOLLOWUP_', size=(55, 10))],
+                         ]
 
-    mainscreenlayout = [[sg.TabGroup([[sg.Tab('Company', tab1_layout, tooltip='tip'),
-                                       sg.Tab('Contact', tab2_layout),
-                                       sg.Tab('Action Items',tab3_layout)]],
-            tooltip='TIP2')],
-            [sg.Button('Read'),
+    contacttab_layout = [[sg.Column(contacttabcol1_layout, background_color=mediumgreen),
+                    sg.Column(contacttabcol2_layout, background_color=mediumgreen)]
+                    ]
+
+    companytabcol1_layout = [[sg.Listbox(companylist, size=(40, 15))],
+                             [sg.Button('New Company', key='_NEWCOMPANY_')]
+                             ]
+
+    companytabcol2_layout = [[sg.T('Company', size=(25, 1)), sg.In(key='_COMPANYNAME_', size=(40, 1))],
+                        [sg.T('Website', size=(25, 1)), sg.In(key='_WEBADDRESS_', size=(40, 1))],
+                         [sg.T('Phone', size=(25, 1)), sg.In(key='_PHONE_', size=(40, 1))],
+                         [sg.T('Street Address 1', size=(25, 1)), sg.In(key='_STREETADDRESS1_', size=(40, 1))],
+                         [sg.T('Street Address 2', size=(25, 1)), sg.In(key='_STREETADDRESS2_', size=(40, 1))],
+                         [sg.T('City', size=(25, 1)), sg.In(key='_CITY_', size=(40, 1))],
+                         [sg.T('State', size=(25, 1)), sg.In(key='_STATE_', size=(40, 1))],
+                         [sg.T('ZIP Code', size=(25, 1)), sg.In(key='_ZIPCODE_', size=(40, 1))],
+                         [sg.T('Notes', size=(25, 1)), sg.Multiline(key='_NOTES_', size=(40, 5))]
+                         ]
+
+    companytab_layout = [[sg.Column(companytabcol1_layout, background_color=mediumgreen),
+                          sg.Column(companytabcol2_layout, background_color=mediumgreen)]]
+
+    actionitemtab_layout = [[sg.Column(Actionitemlisttabcol1_layout, background_color=mediumgreen),
+                             sg.Column(Actionitemlisttabcol2_layout, background_color=mediumgreen)]]
+
+    contactlogtab_layout = [[sg.Column(contactlogtabcol1_layout, background_color=mediumgreen),
+                             sg.Column(contactlogtabcol2_layout, background_color=mediumgreen)]]
+
+    mainscreenlayout = [[sg.Button('Read'),
             sg.Button('New Log Entry', key='_NEW_'),
             sg.Button('Save New', key='_ADDNEW_', disabled=True),
             sg.Button('Save Changes', key='_SAVECHANGES_'),
             sg.Button('Preview Table', key='_PREVIEWTABLE_'),
             sg.Button('Delete Log Entry', key='_DELETELOGENTRY_')],
-            [sg.Text('Message Area', size=(134, 1), key='_MESSAGEAREA_', background_color='white')],
-            [sg.Text('fileinfo', key='_FILEINFO_', size=(134, 1), justification='center',
-            background_color='white'), sg.Exit()]
+            [sg.TabGroup([[sg.Tab('Company Info', companytab_layout, tooltip='tip', background_color=mediumgreen),
+                                       sg.Tab('Contacts', contacttab_layout, background_color=mediumgreen),
+                                       sg.Tab('Action Items',actionitemtab_layout, background_color=mediumgreen),
+                                       sg.Tab('Contact Log',contactlogtab_layout, background_color=mediumgreen)]],
+            tooltip='Tab Group')],
+                        [sg.Text('Message Area', size=(134, 1), key='_MESSAGEAREA_', background_color='white')],
+                        [sg.Text('fileinfo', key='_FILEINFO_', size=(134, 1), justification='center',
+                                background_color='white'), sg.Exit()],
             ]
 
     # ########################################
@@ -227,7 +280,7 @@ def main():
 
     while True:  # Event Loop
         event, values = window.Read()
-        if event is None or event=="Exit":
+        if event is None or event == "Exit":
             sys.exit(1)
 
 
