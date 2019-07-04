@@ -89,7 +89,7 @@ def tableexists(datafile, datatable):
 
 def validatedatafile(datafile):
     if os.path.isfile(datafile):
-        sg.Popup('datafile exist')
+        # sg.Popup('datafile exist')
         return True
     else:
         sg.Popup('Database file does not exist')
@@ -156,9 +156,11 @@ def main():
     '''
 
     if validatedatafile(my_db_file):
-        sg.Popup('db file exists')
+        conn = db_connection(my_db_file)
+    else:
+        sg.Popup('db file does not exist')
 
-    conn = db_connection(my_db_file)
+
     if conn  is not None:
         try:
             actionitemlist = ContactTable(conn,'ActionItemList')
@@ -186,27 +188,39 @@ def main():
             [sg.Text('Company', justification='right', size=(20, 1)), sg.InputText(key='_COMPANYNAME_')],
             [sg.Button('Edit', key='_EDITBUTTON_', disabled=True), sg.Button('New', key='_NEWBUTTON_', disabled=False)]]
 
-    tab2_layout = [[sg.Column(tab2column1_layout, background_color=mediumgreen),
-                         sg.Column(tab2column2_layout, background_color=mediumgreen)]]
+    tab3column1_layout = [[sg.Text('Contact Details', background_color='#d2d2df', justification='center', size=(25, 1))],
+            [sg.Text('Name', justification='right', size=(20,1)), sg.InputText(key='_CONTACTNAME_')],
+            [sg.Text('Email', justification='right', size=(20, 1)), sg.InputText(key='_EMAIL_')],
+            [sg.Text('Phone Number', justification='right', size=(20, 1)), sg.InputText(key='_PHONE_')],
+            [sg.Text('Company', justification='right', size=(20, 1)), sg.InputText(key='_COMPANYNAME_')],
+            [sg.Button('Edit', key='_EDITBUTTON_', disabled=True), sg.Button('New', key='_NEWBUTTON_', disabled=False)]]
 
-    tab1_layout = [[sg.T('This is inside tab 1')],
-                   [sg.In(key='in')]]
-    mainscreenlayout = [[sg.TabGroup([[sg.Tab('Company', tab1_layout, tooltip='tip'), sg.Tab('Contact', tab2_layout)]], tooltip='TIP2')],
-          [sg.Button('Read')],
-                        [sg.Button('New Log Entry', key='_NEW_'),
-                         sg.Button('Save New', key='_ADDNEW_', disabled=True),
-                         sg.Button('Save Changes', key='_SAVECHANGES_'),
-                         sg.Button('Preview Table', key='_PREVIEWTABLE_'),
-                         sg.Button('Delete Log Entry', key='_DELETELOGENTRY_')],
-                        [sg.Text('Message Area', size=(134, 1), key='_MESSAGEAREA_', background_color='white')],
-                        [sg.Text('fileinfo', key='_FILEINFO_', size=(134, 1), justification='center',
-                                background_color='white'), sg.Exit()]
-                        ]
+    tab2_layout = [[sg.Column(tab2column1_layout, background_color=mediumgreen),
+                    sg.Column(tab2column2_layout, background_color=mediumgreen)]]
+
+    tab1_layout = [[sg.T('This is inside tab 1')], [sg.In(key='in')]]
+
+    tab3_layout = [[sg.Column(tab3column1_layout, background_color=mediumgreen)]]
+
+    mainscreenlayout = [[sg.TabGroup([[sg.Tab('Company', tab1_layout, tooltip='tip'),
+                                       sg.Tab('Contact', tab2_layout),
+                                       sg.Tab('Action Items',tab3_layout)]],
+            tooltip='TIP2')],
+            [sg.Button('Read'),
+            sg.Button('New Log Entry', key='_NEW_'),
+            sg.Button('Save New', key='_ADDNEW_', disabled=True),
+            sg.Button('Save Changes', key='_SAVECHANGES_'),
+            sg.Button('Preview Table', key='_PREVIEWTABLE_'),
+            sg.Button('Delete Log Entry', key='_DELETELOGENTRY_')],
+            [sg.Text('Message Area', size=(134, 1), key='_MESSAGEAREA_', background_color='white')],
+            [sg.Text('fileinfo', key='_FILEINFO_', size=(134, 1), justification='center',
+            background_color='white'), sg.Exit()]
+            ]
 
     # ########################################
     # initialize main screen window
     sg.SetOptions(element_padding=(2, 2))
-    window = sg.Window('Project Log App', default_element_size=(15, 1,), background_color=mediumgreen2).Layout(
+    window = sg.Window('Project Log App', default_element_size=(15, 1), background_color=mediumgreen2).Layout(
             mainscreenlayout)
     window.Finalize()
     # window.Refresh()
