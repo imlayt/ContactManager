@@ -36,7 +36,20 @@ class ContactTable:
         :param rowdata:
         :return: True if successful  else False
         '''
-        pass
+
+        try:
+            curr = self.conn.cursor()
+            # print('curr creation succeeded')
+            # print('sqlstring =>', sqlstring)
+            curr.execute(sqlstring, rowdata)
+            # commit the changes
+            conn.commit()
+            # print('curr.execute succeeded')
+            return True
+        except Error as e:
+            print(e)
+            print('createrow FAILED(', rowdata, ')')
+            return False
 
     def readrows(self,sqlstring, manyrows=False):
         '''
@@ -45,7 +58,15 @@ class ContactTable:
         :param manyrows: return all matching rows if True else return 1 row
         :return: list containing 1 or more rows
         '''
-        pass
+
+        try:
+            curr = self.conn.cursor()
+            # print('curr creation succeeded')
+            curr.execute(sqlstring)
+            # print('curr.execute succeeded')
+            therecords = curr.fetchall()
+            # print('therecords => ', therecords)
+            return therecords
 
     def updaterow(self, sqlstring, rowdata):
         '''
@@ -54,8 +75,22 @@ class ContactTable:
         :param rowdata:
         :return: True if successful else False
         '''
-        pass
 
+        try:
+            curr = self.conn.cursor()
+            # print('curr creation succeeded')
+            # print('sqlstring =>', sqlstring)
+            curr.execute(sqlstring, rowdata)
+            # commit the changes
+            self.conn.commit()
+            # print('curr.execute succeeded')
+            return True
+        except Error as e:
+            print(e)
+            print('updatelogentry FAILED(', rowdata, ')')
+            return False
+
+self.conn
     def deleterow(self,sqlstring):
         '''
 
@@ -156,10 +191,10 @@ def main():
 
     :return:
     '''
-    actionitemlist = []
-    contactlist = []
-    companylist = []
-    contactloglist = []
+    actionitemlistbox = []
+    contactlistbox = []
+    companylistbox = []
+    contactloglistbox = []
 
     sql_add_actionitem = []
     sql_update_actionitem = []
@@ -193,7 +228,7 @@ def main():
     # PySimpleGUI form layout
     mainscreencolumn1 = []
 
-    contacttabcol1_layout = [[sg.Listbox(contactlist, size=(40, 15))],
+    contacttabcol1_layout = [[sg.Listbox(contactlistbox, size=(40, 15))],
                              [sg.In(key='_CONTACTNUMBER_', size=(4, 1)),
                               sg.Button('New Contact', key='_NEWCONTACT_'),
                               sg.Button('Save Contact', key='_SAVECONTACT_')]
@@ -212,10 +247,10 @@ def main():
                              [sg.Text('Picture', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTPICTURE_', size=(40, 1))],
                              [sg.Text('Last Updated', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTLASTUPDATED_', size=(40, 1))],
                              [sg.Text('Notes', justification='right', size=(20, 1)),
-                              sg.Multiline(key='_CONTACTNOTES_', size=(40, 10))],
+                              sg.Multiline(key='_CONTACTNOTES_', size=(40, 10))]
                              ]
 
-    Actionitemlisttabcol1_layout = [[sg.Listbox(actionitemlist, size=(40, 15))],
+    Actionitemlisttabcol1_layout = [[sg.Listbox(actionitemlistbox, size=(40, 15))],
                                     [sg.In(key='_ACTIONITEMNUMBER_', size=(4, 1)),
                                      sg.Button('New Action Item', key='_NEWACTIONITEM_'),
                                      sg.Button('Save Action Item', key='_SAVEACTIONITEM_')]
@@ -228,10 +263,10 @@ def main():
                          [sg.T('Status Date', size=(25, 1)), sg.In(key='_ACTIONITEMLISTSTATUSDATE_', size=(40, 1))],
                         [sg.T('Action Item', size=(10, 1)),
                         sg.Multiline(key='_ACTIONITEMLISTACTIONITEM_', size=(55, 10))],
-                        [sg.T('Notes', size=(10, 1)), sg.Multiline(key='_ACTIONITEMLISTNOTES_', size=(55, 10))],
+                        [sg.T('Notes', size=(10, 1)), sg.Multiline(key='_ACTIONITEMLISTNOTES_', size=(55, 10))]
                          ]
 
-    contactlogtabcol1_layout = [[sg.Listbox(contactloglist, size=(40, 15))],
+    contactlogtabcol1_layout = [[sg.Listbox(contactloglistbox, size=(40, 15))],
                              [sg.In(key='_CONTACTLOGNUMBER_', size=(4, 1)),
                               sg.Button('New Contact Log Item', key='_NEWCONTACTLOGITETM_'),
                                sg.Button('Save Log Item', key='_SAVECONTACTLOG_')]
@@ -243,14 +278,14 @@ def main():
                          [sg.T('Date/Time', size=(25, 1)), sg.In(key='_CONTACTLOGDATETIME_', size=(40, 1))],
                          [sg.T('Purpose', size=(25, 1)), sg.In(key='_CONTACTLOGPURPOSE_', size=(40, 1))],
                         [sg.T('Outcome', size=(10, 1)), sg.In(key='_CONTACTLOGOUTCOME_', size=(55, 10))],
-                        [sg.T('Follow Up', size=(10, 1)), sg.Multiline(key='_CONTACTLOGFOLLOWUP_', size=(55, 10))],
+                        [sg.T('Follow Up', size=(10, 1)), sg.Multiline(key='_CONTACTLOGFOLLOWUP_', size=(55, 10))]
                          ]
 
     contacttab_layout = [[sg.Column(contacttabcol1_layout, background_color=mediumgreen),
                     sg.Column(contacttabcol2_layout, background_color=mediumgreen)]
                     ]
 
-    companytabcol1_layout = [[sg.Listbox(companylist, size=(40, 15))],
+    companytabcol1_layout = [[sg.Listbox(companylistbox, size=(40, 15))],
                              [sg.In(key='_COMPANYNUMBER_', size=(4, 1)),
                                 sg.Button('New Company', key='_NEWCOMPANY_'),
                                 sg.Button('Save Company', key='_SAVECOMPANY_')]
@@ -306,19 +341,23 @@ def main():
             break
         elif event == '_NEWCOMPANY_':
             sg.Popup('_NEWCOMPANY_')
-            company.createrow(sql_add_company, getcompanyrow(window))
+            if company.createrow(sql_add_company, getcompanyrow(window)):
+                setmessage('New company added', window)
 
         elif event == '_SAVECOMPANY_':
             sg.Popup('_SAVECOMPANY_')
-            company.updaterow(sql_update_actionitem, getcompanyrow(window))
+            if company.updaterow(sql_update_actionitem, getcompanyrow(window)):
+                setmessage('Company info saved', window)
 
         elif event == '_NEWCONTACT_':
             sg.Popup('_NEWCONTACT_')
-            contact.createrow(sql_add_contact, getcompanyrow(window))
+            if contact.createrow(sql_add_contact, getcompanyrow(window)):
+                setmessage('New contact added', window)
 
         elif event=='_SAVECONTACT_':
             sg.Popup('_SAVECONTACT_')
-            contact.updaterow(sql_update_contact, getcompanyrow(window))
+            if contact.updaterow(sql_update_contact, getcompanyrow(window)):
+                setmessage('Contact info saved', window)
 
         elif event == '_NEWACTIONITEM_':
             sg.Popup('_NEWACTIONITEM_')
