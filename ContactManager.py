@@ -242,15 +242,58 @@ def fillcontactrow(table, contactnumber, window):
     window.FindElement('_CONTACTFIRSTNAME_').Update(contactrow[0][3])
     window.FindElement('_CONTACTJOBTITLE_').Update(contactrow[0][4])
     window.FindElement('_CONTACTCOMPANY_').Update(contactrow[0][5])
-    window.FindElement('_WORKPHONE_').Update(contactrow[0][6])
-    window.FindElement('_CELLPHONE_').Update(contactrow[0][7])
+    window.FindElement('_CONTACTWORKPHONE_').Update(contactrow[0][6])
+    window.FindElement('_CONTACTCELLPHONE_').Update(contactrow[0][7])
     window.FindElement('_CONTACTWORKEMAIL_').Update(contactrow[0][8])
     window.FindElement('_CONTACTPERSONALEMAIL_').Update(contactrow[0][9])
     window.FindElement('_CONTACTPICTURE_').Update(contactrow[0][11])
     window.FindElement('_CONTACTLASTUPDATED_').Update(contactrow[0][12])
     window.FindElement('_CONTACTNOTES_').Update(contactrow[0][10])
     window.Refresh()
-    return contactnumber
+
+    return True
+
+def fillactionitemlistbox(table,window, currentcompany):
+    '''
+
+    :param table:
+    :param window:
+    :param currentcompany:
+    :return:
+    '''
+    sqlstr = 'SELECT ActionItem, CreatedDate, ID FROM ActionItemList where CompanyID = ? order by ID;'
+
+    print('sqlstr, currentcompany =>', sqlstr, currentcompany)
+    actionitemboxlist = table.readrows(sqlstr, currentcompany)
+    actionitemnumber = actionitemboxlist[0][2]
+    # print('actionitemnumber', actionitemnumber)
+    # print('actionitemboxlist =>', actionitemboxlist)
+    window.FindElement('_ACTIONITEMLISTBOX_').Update(actionitemboxlist)
+
+    return actionitemnumber
+
+
+def fillactionitemrow(table, actionitemnumber, window):
+    '''
+
+    :param table:
+    :param actionitemnumber:
+    :param window:
+    :return: True/False
+    '''
+    sqlstring = 'SELECT * from ActionItemList WHERE ID = ? ;'
+    actionitemrow = table.readrows(sqlstring, actionitemnumber)
+
+    window.FindElement('_ACTIONITEMNUMBER_').Update(actionitemrow[0][0])
+    window.FindElement('_ACTIONITEMLISTCOMPANYNAME_').Update(actionitemrow[0][1])
+    window.FindElement('_ACTIONITEMLISTCREATED_').Update(actionitemrow[0][2])
+    window.FindElement('_ACTIONITEMLISTDUEDATE').Update(actionitemrow[0][3])
+    window.FindElement('_ACTIONITEMLISTACTIONITEM_').Update(actionitemrow[0][4])
+    window.FindElement('_ACTIONITEMLISTNOTES_').Update(actionitemrow[0][5])
+    window.FindElement('_ACTIONITEMLISTSTATUS_').Update(actionitemrow[0][6])
+    window.FindElement('_ACTIONITEMLISTSTATUSDATE_').Update(actionitemrow[0][7])
+    window.Refresh()
+
 
 def fillcompanyrow(table, companynumber, window):
     '''
@@ -340,8 +383,8 @@ def main():
                              [sg.Text('First Name', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTFIRSTNAME_', size=(40, 1))],
                              [sg.Text('Job Title', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTJOBTITLE_', size=(40, 1))],
                              [sg.Text('Company', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTCOMPANY_', size=(40, 1))],
-                             [sg.Text('Work Phone', justification='right', size=(20, 1)), sg.InputText(key='_WORKPHONE_', size=(40, 1))],
-                             [sg.Text('Cell Phone', justification='right', size=(20, 1)), sg.InputText(key='_CELLPHONE_', size=(40, 1))],
+                             [sg.Text('Work Phone', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTWORKPHONE_', size=(40, 1))],
+                             [sg.Text('Cell Phone', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTCELLPHONE_', size=(40, 1))],
                              [sg.Text('Work Email', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTWORKEMAIL_', size=(40, 1))],
                              [sg.Text('Personal Email', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTPERSONALEMAIL_', size=(40, 1))],
                              [sg.Text('Picture', justification='right', size=(20, 1)), sg.InputText(key='_CONTACTPICTURE_', size=(40, 1))],
@@ -358,7 +401,7 @@ def main():
 
     actionitemlisttabcol2_layout = [[sg.T('Company', size=(25, 1)), sg.In(key='_ACTIONITEMLISTCOMPANYNAME_', size=(40, 1))],
                         [sg.T('Created', size=(25, 1)), sg.In(key='_ACTIONITEMLISTCREATED_', size=(40, 1))],
-                         [sg.T('Due Date', size=(25, 1)), sg.In(key='ACTIONITEMLISTDUEDATE', size=(40, 1))],
+                         [sg.T('Due Date', size=(25, 1)), sg.In(key='_ACTIONITEMLISTDUEDATE', size=(40, 1))],
                          [sg.T('Status', size=(25, 1)), sg.In(key='_ACTIONITEMLISTSTATUS_', size=(40, 1))],
                          [sg.T('Status Date', size=(25, 1)), sg.In(key='_ACTIONITEMLISTSTATUSDATE_', size=(40, 1))],
                         [sg.T('Action Item', size=(10, 1)),
@@ -431,8 +474,10 @@ def main():
     fillscreen(window,0,0)  # fill all the fields based on the first company and the first contact in that company
     currentcompany = fillcompanylistbox(thecompany, window)
     currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
+    currentactionitem = fillactionitemlistbox(theactionitemlist,window,currentcompany)
     fillcompanyrow(thecompany,currentcompany,window)
     fillcontactrow(thecontact,currentcontact,window)
+    fillactionitemrow(theactionitemlist,currentactionitem,window)
 
     while True:  # Event Loop
         event, values = window.Read()
@@ -440,11 +485,11 @@ def main():
             break
         elif event == '_NEWCOMPANY_':
             sg.Popup('_NEWCOMPANY_')
-            if company.createrow(sql_add_company, getcompanyrow(window)):
+            if thecompany.createrow(sql_add_company, getcompanyrow(window)):
                 setmessage('New company added', window)
         elif event == '_SAVECOMPANY_':
             sg.Popup('_SAVECOMPANY_')
-            if company.updaterow(sql_update_actionitem, getcompanyrow(window)):
+            if thecompany.updaterow(sql_update_actionitem, getcompanyrow(window)):
                 setmessage('Company info saved', window)
         elif event == '_COMPANYLISTBOX_':
             # sg.Popup('_COMPANYLISTBOX_', values['_COMPANYLISTBOX_'][0][1])
@@ -452,7 +497,8 @@ def main():
             currentcompany = values['_COMPANYLISTBOX_'][0][1]
             fillcompanyrow(thecompany, currentcompany, window)
             currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
-            currentcontact = fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1], window)
+            fillcontactrow(thecontact, currentcontact, window)
+            # currentcontact = fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1], window)
 
 
             fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
@@ -468,7 +514,6 @@ def main():
         elif event == '_CONTACTLISTBOX_':
             # sg.Popup('_CONTACTLISTBOX_', values['_CONTACTLISTBOX_'][0][1])
             # fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
-
             currentcontact = fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1],window)
 
 
