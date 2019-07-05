@@ -14,7 +14,9 @@ lightblue = '#b9def4'  # color used by PySimpleGUIdef __init__(self, logfile, ta
 mediumblue = '#d2d2df'  # color used by PySimpleGUI
 mediumblue2 = '#534aea'  # color used by PySimpleGUI
 mediumgreen = '#66b3b3'  # color used by PySimpleGUI
-mediumgreen2 = '#00aaaa'  # color used by PySimpleGUI
+mediumgreen2 = '#00aaaa'  # color used by PySimpleGUIs
+
+
 
 class ContactTable:
     def __init__(self, connection, datatable):
@@ -154,10 +156,22 @@ def main():
 
     :return:
     '''
-
+    actionitemlist = []
     contactlist = []
     companylist = []
     contactloglist = []
+
+    sql_add_actionitem = []
+    sql_update_actionitem = []
+
+    sql_add_company = []
+    sql_update_company = []
+
+    sql_add_contact = []
+    sql_update_contact = []
+
+    sql_add_contactlog = []
+    sql_update_contactlog = []
 
 
     if validatedatafile(my_db_file):
@@ -180,7 +194,9 @@ def main():
     mainscreencolumn1 = []
 
     contacttabcol1_layout = [[sg.Listbox(contactlist, size=(40, 15))],
-                             [sg.Button('New Contact', key='_NEWCONTACT_')]
+                             [sg.In(key='_CONTACTNUMBER_', size=(4, 1)),
+                              sg.Button('New Contact', key='_NEWCONTACT_'),
+                              sg.Button('Save Contact', key='_SAVECONTACT_')]
                              ]
 
     contacttabcol2_layout = [[sg.Text('Contact Details', background_color='#d2d2df', justification='center', size=(60, 1))],
@@ -199,8 +215,10 @@ def main():
                               sg.Multiline(key='_CONTACTNOTES_', size=(40, 10))],
                              ]
 
-    Actionitemlisttabcol1_layout = [[sg.Listbox(contactlist, size=(40, 15))],
-                             [sg.Button('New Action Item', key='_NEWACTIONITEM_')]
+    Actionitemlisttabcol1_layout = [[sg.Listbox(actionitemlist, size=(40, 15))],
+                                    [sg.In(key='_ACTIONITEMNUMBER_', size=(4, 1)),
+                                     sg.Button('New Action Item', key='_NEWACTIONITEM_'),
+                                     sg.Button('Save Action Item', key='_SAVEACTIONITEM_')]
                              ]
 
     Actionitemlisttabcol2_layout = [[sg.T('Company', size=(25, 1)), sg.In(key='_ACTIONITEMLISTCOMPANYNAME_', size=(40, 1))],
@@ -214,7 +232,9 @@ def main():
                          ]
 
     contactlogtabcol1_layout = [[sg.Listbox(contactloglist, size=(40, 15))],
-                             [sg.Button('New Contact Log Item', key='_NEWCONTACTLOGITETM_')]
+                             [sg.In(key='_CONTACTLOGNUMBER_', size=(4, 1)),
+                              sg.Button('New Contact Log Item', key='_NEWCONTACTLOGITETM_'),
+                               sg.Button('Save Log Item', key='_SAVECONTACTLOG_')]
                              ]
 
     contactlogtabcol2_layout = [[sg.T('Company', size=(25, 1)), sg.In(key='_ACTIONITEMLISTCOMPANYNAME_', size=(40, 1))],
@@ -231,7 +251,9 @@ def main():
                     ]
 
     companytabcol1_layout = [[sg.Listbox(companylist, size=(40, 15))],
-                             [sg.Button('New Company', key='_NEWCOMPANY_')]
+                             [sg.In(key='_COMPANYNUMBER_', size=(4, 1)),
+                                sg.Button('New Company', key='_NEWCOMPANY_'),
+                                sg.Button('Save Company', key='_SAVECOMPANY_')]
                              ]
 
     companytabcol2_layout = [[sg.T('Company', size=(25, 1)), sg.In(key='_COMPANYNAME_', size=(40, 1))],
@@ -261,12 +283,12 @@ def main():
             sg.Button('Preview Table', key='_PREVIEWTABLE_'),
             sg.Button('Delete Log Entry', key='_DELETELOGENTRY_')],
             [sg.TabGroup([[sg.Tab('Company Info', companytab_layout, tooltip='tip', background_color=mediumgreen),
-                                       sg.Tab('Contacts', contacttab_layout, background_color=mediumgreen),
-                                       sg.Tab('Action Items',actionitemtab_layout, background_color=mediumgreen),
-                                       sg.Tab('Contact Log',contactlogtab_layout, background_color=mediumgreen)]],
+                            sg.Tab('Contacts', contacttab_layout, background_color=mediumgreen),
+                            sg.Tab('Action Items',actionitemtab_layout, background_color=mediumgreen),
+                            sg.Tab('Contact Log',contactlogtab_layout, background_color=mediumgreen)]],
             tooltip='Tab Group')],
-                        [sg.Text('Message Area', size=(134, 1), key='_MESSAGEAREA_', background_color='white')],
-                        [sg.Text('fileinfo', key='_FILEINFO_', size=(134, 1), justification='center',
+                        [sg.Text('Message Area', size=(110, 1), key='_MESSAGEAREA_', background_color='white')],
+                        [sg.Text('fileinfo', key='_FILEINFO_', size=(110, 1), justification='center',
                                 background_color='white'), sg.Exit()],
             ]
 
@@ -281,10 +303,34 @@ def main():
     while True:  # Event Loop
         event, values = window.Read()
         if event is None or event == "Exit":
-            sys.exit(1)
+            break
+        elif event == '_NEWCOMPANY_':
+            sg.Popup('_NEWCOMPANY_')
+            company.createrow(sql_add_company, getcompanyrow(window))
 
+        elif event == '_SAVECOMPANY_':
+            sg.Popup('_SAVECOMPANY_')
+            company.updaterow(sql_update_actionitem, getcompanyrow(window))
 
+        elif event == '_NEWCONTACT_':
+            sg.Popup('_NEWCONTACT_')
+            contact.createrow(sql_add_contact, getcompanyrow(window))
 
+        elif event=='_SAVECONTACT_':
+            sg.Popup('_SAVECONTACT_')
+            contact.updaterow(sql_update_contact, getcompanyrow(window))
+
+        elif event == '_NEWACTIONITEM_':
+            sg.Popup('_NEWACTIONITEM_')
+
+        elif event == '_SAVEACTIONITEM_':
+            sg.Popup('_SAVEACTIONITEM_')
+
+        elif event == '_NEWCONTACTLOGITETM_':
+            sg.Popup('_NEWCONTACTLOGITETM_')
+
+        elif event=='_SAVECONTACTLOG_':
+            sg.Popup('_SAVECONTACTLOG_')
 
 # ##########################################
 # execute the main function
