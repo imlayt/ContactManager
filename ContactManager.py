@@ -51,22 +51,29 @@ class ContactTable:
             print('createrow FAILED(', rowdata, ')')
             return False
 
-    def readrows(self,sqlstring):
+    def readrows(self,sqlstring,sqlvaluelist=None):
         '''
 
         :param sqlstring:
+        :param sqlvaluelist: values to be inserted into the sqlstring when the cursor is executed
         :return: list containing 1 or more rows or None
         '''
 
         try:
             curr = self.conn.cursor()
             # print('curr creation succeeded')
-            curr.execute(sqlstring)
+            if sqlvaluelist is None:
+                curr.execute(sqlstring)
+            else:
+                # print('cur.execute =>', sqlstring, sqlvaluelist)
+                curr.execute(sqlstring, str(sqlvaluelist))
+
             # print('curr.execute succeeded')
             therecords = curr.fetchall()
             # print('therecords => ', therecords)
             return therecords
-        except:
+        except Error as e:
+            print(e)
             return None
 
     def updaterow(self, sqlstring, rowdata):
@@ -175,25 +182,34 @@ def fillcompanylistbox(table, window):
     sqlstr = 'SELECT CompanyName, ID FROM Company order by CompanyName;'
 
     companyboxlist = table.readrows(sqlstr)
-    print('companyboxlist =>', companyboxlist)
+    companynumber = companyboxlist[0][1]
+    # print('currentcompany =>', companynumber)
+    # print('companyboxlist =>', companyboxlist)
     window.FindElement('_COMPANYLISTBOX_').Update(companyboxlist)
+    return companynumber
 
 
-def fillcontactlistbox(table,window):
+def fillcontactlistbox(table,window, currentcompany):
     '''
 
-    :return: True/False
+    :param table:
+    :param window:
+    :param currentcompany:
+    :return:
     '''
-    sqlstr = 'SELECT ContactName, ID FROM Contact order by ContactName;'
+    sqlstr = 'SELECT ContactName, ID FROM Contact where CompanyID = ? order by ContactName;'
 
-    contactboxlist = table.readrows(sqlstr)
-    print('contactboxlist =>', contactboxlist)
+    contactboxlist = table.readrows(sqlstr, currentcompany)
+    contactnumber = contactboxlist[0][1]
+    # print('contactnumber', contactnumber)
+    # print('contactboxlist =>', contactboxlist)
     window.FindElement('_CONTACTLISTBOX_').Update(contactboxlist)
+    return contactnumber
     
 
 def getactionitemrow(window):
-    '''
 
+    '''
     :param window:
     :return:
     '''
@@ -208,14 +224,58 @@ def getcompanyrow(window):
     companyrow = []
     return companyrow
 
-def getcontactrow(window):
+
+def fillcontactrow(table, contactnumber, window):
     '''
 
+    :param table:
+    :param contactnumber:
     :param window:
-    :return: list of values representing a row in the contact table
+    :return: True/False
     '''
-    contactrow = []
-    return contactrow
+    sqlstring = 'SELECT * from Contact WHERE ID = ? ;'
+    contactrow = table.readrows(sqlstring, contactnumber)
+
+    window.FindElement('_CONTACTNUMBER_').Update(contactrow[0][0])
+    window.FindElement('_CONTACTNAME_').Update(contactrow[0][1])
+    window.FindElement('_CONTACTLASTNAME_').Update(contactrow[0][2])
+    window.FindElement('_CONTACTFIRSTNAME_').Update(contactrow[0][3])
+    window.FindElement('_CONTACTJOBTITLE_').Update(contactrow[0][4])
+    window.FindElement('_CONTACTCOMPANY_').Update(contactrow[0][5])
+    window.FindElement('_WORKPHONE_').Update(contactrow[0][6])
+    window.FindElement('_CELLPHONE_').Update(contactrow[0][7])
+    window.FindElement('_CONTACTWORKEMAIL_').Update(contactrow[0][8])
+    window.FindElement('_CONTACTPERSONALEMAIL_').Update(contactrow[0][9])
+    window.FindElement('_CONTACTPICTURE_').Update(contactrow[0][11])
+    window.FindElement('_CONTACTLASTUPDATED_').Update(contactrow[0][12])
+    window.FindElement('_CONTACTNOTES_').Update(contactrow[0][10])
+    window.Refresh()
+    return contactnumber
+
+def fillcompanyrow(table, companynumber, window):
+    '''
+
+    :param table:
+    :param companynumber:
+    :param window:
+    :return:
+    '''
+    sqlstring = 'SELECT * from Company WHERE ID = ? ;'
+    contactrow = table.readrows(sqlstring, companynumber)
+
+    window.FindElement('_COMPANYNUMBER_').Update(contactrow[0][0])
+    window.FindElement('_COMPANYNAME_').Update(contactrow[0][1])
+    window.FindElement('_WEBADDRESS_').Update(contactrow[0][2])
+    window.FindElement('_STREETADDRESS1_').Update(contactrow[0][3])
+    window.FindElement('_STREETADDRESS2_').Update(contactrow[0][4])
+    window.FindElement('_CITY_').Update(contactrow[0][5])
+    window.FindElement('_STATE_').Update(contactrow[0][6])
+    window.FindElement('_ZIPCODE_').Update(contactrow[0][7])
+    window.FindElement('_NOTES_').Update(contactrow[0][8])
+    window.FindElement('_PHONE_').Update(contactrow[0][9])
+
+    return companynumber
+
 
 def getcontactlogrow(window):
     pass
@@ -233,22 +293,27 @@ def main():
 
     sql_add_actionitem = ''
     sql_update_actionitem = ''
+    sql_read_actionitem = ''
 
     sql_add_company = ''
     sql_update_company = ''
+    sql_read_company = ''
 
     sql_add_contact = ''
     sql_update_contact = ''
+    sql_read_contact = ''
 
     sql_add_contactlog = ''
     sql_update_contactlog = ''
+    sql_read_contactlog = ''
 
 
     if validatedatafile(my_db_file):
         conn = db_connection(my_db_file)
+        fileinfo = my_db_file
     else:
         conn = None
-        sg.Popup('db file does not exist')
+        sg.Popup('db file %s does not exist', my_db_file)
 
 
     if conn is not None:
@@ -352,8 +417,8 @@ def main():
                             sg.Tab('Contact Log',contactlogtab_layout, background_color=mediumgreen)]],
             tooltip='Tab Group')],
                         [sg.Text('Message Area', size=(110, 1), key='_MESSAGEAREA_', background_color='white')],
-                        [sg.Text('fileinfo', key='_FILEINFO_', size=(110, 1), justification='center',
-                                background_color='white'), sg.Exit()],
+                        [sg.Text(fileinfo, key='_FILEINFO_', size=(110, 1), justification='center',
+                                background_color='lightblue'), sg.Exit()],
             ]
 
     # ########################################
@@ -364,8 +429,10 @@ def main():
     window.Finalize()
     # window.Refresh()
     fillscreen(window,0,0)  # fill all the fields based on the first company and the first contact in that company
-    fillcompanylistbox(thecompany, window)
-    fillcontactlistbox(thecontact, window)
+    currentcompany = fillcompanylistbox(thecompany, window)
+    currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
+    fillcompanyrow(thecompany,currentcompany,window)
+    fillcontactrow(thecontact,currentcontact,window)
 
     while True:  # Event Loop
         event, values = window.Read()
@@ -380,20 +447,29 @@ def main():
             if company.updaterow(sql_update_actionitem, getcompanyrow(window)):
                 setmessage('Company info saved', window)
         elif event == '_COMPANYLISTBOX_':
-            sg.Popup('_COMPANYLISTBOX_', values['_COMPANYLISTBOX_'])
+            # sg.Popup('_COMPANYLISTBOX_', values['_COMPANYLISTBOX_'][0][1])
+
+            currentcompany = values['_COMPANYLISTBOX_'][0][1]
+            fillcompanyrow(thecompany, currentcompany, window)
+            currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
+            currentcontact = fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1], window)
+
+
             fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
 
         elif event == '_NEWCONTACT_':
             sg.Popup('_NEWCONTACT_')
-            if contact.createrow(sql_add_contact, getcontactrow(window)):
+            if thecontact.createrow(sql_add_contact, getcontactrow(window)):
                 setmessage('New contact added', window)
         elif event=='_SAVECONTACT_':
             sg.Popup('_SAVECONTACT_')
-            if contact.updaterow(sql_update_contact, getcontactrow(window)):
+            if thecontact.updaterow(sql_update_contact, getcontactrow(window)):
                 setmessage('Contact info saved', window)
         elif event == '_CONTACTLISTBOX_':
-            sg.Popup('_CONTACTLISTBOX_', values['_CONTACTLISTBOX_'])
-            fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
+            # sg.Popup('_CONTACTLISTBOX_', values['_CONTACTLISTBOX_'][0][1])
+            # fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
+
+            currentcontact = fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1],window)
 
 
         elif event == '_NEWACTIONITEM_':
