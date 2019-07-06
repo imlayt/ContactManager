@@ -368,6 +368,7 @@ def main():
     companylistbox = []
     contactloglistbox = []
 
+
     if validatedatafile(my_db_file):
         conn = db_connection(my_db_file)
         fileinfo = my_db_file
@@ -436,8 +437,7 @@ def main():
                         [sg.T('Notes', size=(10, 1)), sg.Multiline(key='_ACTIONITEMLISTNOTES_', size=(55, 10))]
                          ]
 
-    contactlogtabcol1_layout = [[sg.Listbox(contactloglistbox, size=(40, 15), key='_CONTACTLOGLISTBOX_',
-                                enable_events=True)],
+    contactlogtabcol1_layout = [[sg.Listbox(contactloglistbox, size=(40, 5), key='_CONTACTLOGLISTBOX_')],
                                 [sg.In(key='_CONTACTLOGNUMBER_', size=(4, 1),disabled=True, visible=False),
                                  sg.Button('New Contact Log Item', key='_NEWCONTACTLOGITETM_'),
                                  sg.Button('Save Log Item', key='_SAVECONTACTLOG_')]]
