@@ -526,8 +526,52 @@ def savecompanyrow(table, companyrow, thecompany=None):
         sg.Popup('FAILED to save company row data')
 
 
-def getcontactlogrow(window):
-    pass
+def getcontactlogrow(values):
+    '''
+
+    :param values:
+    :return: list of values representing a row in the contactlog table
+    '''
+    contactlogrow = []
+
+    contactlogrow.append(values['_CONTACTLOGNUMBER_'])
+    contactlogrow.append(values['_CONTACTLOGCOMPANYID_'])
+    contactlogrow.append(values['_CONTACTLOGCONTACT_'])
+    contactlogrow.append(values['_CONTACTLOGDATETIME_'])
+    contactlogrow.append(values['_CONTACTLOGPURPOSE_'])
+    contactlogrow.append(values['_CONTACTLOGOUTCOME_'])
+    contactlogrow.append(values['_CONTACTLOGFOLLOWUP_'])
+
+    return contactlogrow
+
+
+def savecontactlogrow(table, contactlogrow, thecontactlog=None):
+    '''
+
+    :param table:
+    :param contactlogrow:
+    :param thecontactlog:
+    :return:
+    '''
+
+    sqlstring = '''
+    UPDATE ContactLog SET 
+    ID=?, 
+    CompanyID = ?,
+    ContactID = ?,
+    DateTime = ?,
+    Purpose = ?,
+    Outcome = ?,
+    FollowUp = ?
+    WHERE ID = ?
+    '''
+    # print('companyrow[0] =>', companyrow[0])
+    contactlogrow.append(contactlogrow[0])
+    # print('companyrow => ', companyrow)
+    if table.updaterow(sqlstring, contactlogrow):
+        sg.Popup('Saved company row data')
+    else:
+        sg.Popup('FAILED to save contact log row data')
 
 
 def main():
@@ -724,7 +768,7 @@ def main():
             if thecompany.createrow(sql_add_company, getcompanyrow(values)):
                 setmessage('New company added', window)
         elif event == '_SAVECOMPANY_':
-            sg.Popup('_SAVECOMPANY_')
+            # sg.Popup('_SAVECOMPANY_')
             if savecompanyrow(thecompany,getcompanyrow(values),values['_COMPANYNUMBER_']):
                 setmessage('Company info saved', window)
         elif event == '_COMPANYLISTBOX_':
@@ -749,7 +793,7 @@ def main():
             if thecontact.createrow(sql_add_contact, getcontactrow(window)):
                 setmessage('New contact added', window)
         elif event == '_SAVECONTACT_':
-            sg.Popup('_SAVECONTACT_')
+            # sg.Popup('_SAVECONTACT_')
             if savecontactrow(thecontact, getcontactrow(values), values['_CONTACTNUMBER_']):
                 setmessage('Contact info saved', window)
         elif event == '_CONTACTLISTBOX_':
@@ -760,7 +804,7 @@ def main():
         elif event == '_NEWACTIONITEM_':
             sg.Popup('_NEWACTIONITEM_')
         elif event == '_SAVEACTIONITEM_':
-            sg.Popup('_SAVEACTIONITEM_')
+            # sg.Popup('_SAVEACTIONITEM_')
             if saveactionitemrow(theactionitemlist, getactionitemrow(values), values['_ACTIONITEMNUMBER_']):
                 setmessage('Action Item info saved', window)
         elif event == '_ACTIONITEMLISTBOX_':
@@ -769,7 +813,9 @@ def main():
         elif event == '_NEWCONTACTLOGITETM_':
             sg.Popup('_NEWCONTACTLOGITETM_')
         elif event == '_SAVECONTACTLOG_':
-            sg.Popup('_SAVECONTACTLOG_')
+            # sg.Popup('_SAVECONTACTLOG_')
+            if savecontactlogrow(thecontactlog, getcontactlogrow(values), values['_CONTACTLOGNUMBER_']):
+                setmessage('Contact log info saved', window)
         elif event == '_CONTACTLOGLISTBOX_':
             fillcontactlogrow(thecontactlog, values['_CONTACTLOGLISTBOX_'][0][2],window)
 
