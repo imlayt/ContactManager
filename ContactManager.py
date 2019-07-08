@@ -146,6 +146,7 @@ def setmessage(message, window):
     :param message:
     :return:
     '''
+    print('new message => ', message)
     window.FindElement('_MESSAGEAREA_').Update(message)
     window.Refresh()
 
@@ -521,9 +522,66 @@ def savecompanyrow(table, companyrow, thecompany=None):
     companyrow.append(companyrow[0])
     # print('companyrow => ', companyrow)
     if table.updaterow(sqlstring, companyrow):
-        sg.Popup('Saved company row data')
+        return True
     else:
         sg.Popup('FAILED to save company row data')
+        return False
+
+
+def newcompanyrow(table, companyrow):
+    '''
+
+    :param table:
+    :param companyrow:
+    :param thecompany:
+    :return: True/False
+    '''
+
+    newcompanyinfo = companyrow[1:]
+    print('companyrow => ', companyrow)
+    print('newcompanyinfo => ', newcompanyinfo)
+
+    sqlstring = '''
+    INSERT into Company (
+    CompanyName,
+    WebAddress,
+    StreetAddress1, 
+    StreetAddress2, 
+    City, 
+    State, 
+    ZIP_Code, 
+    Notes, 
+    Phone)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    '''
+
+    if table.createrow(sqlstring, newcompanyinfo):
+        # sg.Popup('Created company row')
+        return true
+    else:
+        # sg.Popup('FAILED to create company row')
+        return False
+
+
+def clearcompanyrow(window):
+    '''
+
+    :param table:
+    :param companynumber:
+    :param window:
+    :return:
+    '''
+
+    window.FindElement('_COMPANYNUMBER_').Update('')
+    window.FindElement('_COMPANYNAME_').Update('')
+    window.FindElement('_WEBADDRESS_').Update('')
+    window.FindElement('_STREETADDRESS1_').Update('')
+    window.FindElement('_STREETADDRESS2_').Update('')
+    window.FindElement('_CITY_').Update('')
+    window.FindElement('_STATE_').Update('')
+    window.FindElement('_ZIPCODE_').Update('')
+    window.FindElement('_NOTES_').Update('')
+    window.FindElement('_PHONE_').Update('')
 
 
 def getcontactlogrow(values):
@@ -729,14 +787,14 @@ def main():
 
     mainscreenlayout = [[sg.Menu(menu_def, )],
                         [sg.Column(companytabcol1_layout, background_color='lightblue'),
-                         sg.TabGroup([[sg.Tab('Company Info', companytab_layout, tooltip='tip', background_color=mediumgreen),
-                            sg.Tab('Contacts', contacttab_layout, background_color=mediumgreen),
-                            sg.Tab('Action Items',actionitemtab_layout, background_color=mediumgreen),
-                            sg.Tab('Contact Log',contactlogtab_layout, background_color=mediumgreen)]],
-            tooltip='Tab Group')],
-                        [sg.Text('Message Area', size=(110, 1), key='_MESSAGEAREA_', background_color='white')],
+                        sg.TabGroup([[sg.Tab('Company Info', companytab_layout, tooltip='tip', background_color=mediumgreen),
+                        sg.Tab('Contacts', contacttab_layout, background_color=mediumgreen),
+                        sg.Tab('Action Items',actionitemtab_layout, background_color=mediumgreen),
+                        sg.Tab('Contact Log',contactlogtab_layout, background_color=mediumgreen)]],
+                            tooltip='Tab Group')],
+                        [sg.InputText('Message Area', size=(110, 1), key='_MESSAGEAREA_', background_color='white')],
                         [sg.Text(fileinfo, key='_FILEINFO_', size=(110, 1), justification='center',
-                                background_color='lightblue'), sg.Exit()],
+                        background_color='lightblue'), sg.Exit()],
             ]
 
     # ########################################
@@ -763,13 +821,18 @@ def main():
             window.Close()
             break
         elif event == '_NEWCOMPANY_':
-            sg.Popup('_NEWCOMPANY_')
-            continue
-            if thecompany.createrow(sql_add_company, getcompanyrow(values)):
-                setmessage('New company added', window)
+            clearcompanyrow(window)
+            setmessage('Company data cleared', window)
+            # sg.Popup('_NEWCOMPANY_')
+            #   if newcompanyrow(getcompanyrow(values)):
+            # setmessage('New company added', window)
         elif event == '_SAVECOMPANY_':
             # sg.Popup('_SAVECOMPANY_')
-            if savecompanyrow(thecompany,getcompanyrow(values),values['_COMPANYNUMBER_']):
+            if len(values['_COMPANYNUMBER_']) == 0:
+                if newcompanyrow( thecompany,getcompanyrow(values)):
+                    currentcompany = fillcompanylistbox(thecompany, window)
+                    setmessage('New company added', window)
+            elif savecompanyrow(thecompany,getcompanyrow(values),values['_COMPANYNUMBER_']):
                 setmessage('Company info saved', window)
         elif event == '_COMPANYLISTBOX_':
             # sg.Popup('_COMPANYLISTBOX_', values['_COMPANYLISTBOX_'][0][1])
