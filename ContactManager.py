@@ -7,7 +7,8 @@ import sys
 from datetime import datetime
 
 
-my_db_file = 'C:/Users/imlay/OneDrive/Documents/my-CRM-AppData.db'
+# my_db_file = 'C:/Users/imlay/OneDrive/Documents/my-CRM-AppData.db'
+my_db_file = 'my-CRM-AppData.db'
 # my_db_file = ''
 
 lightblue = '#b9def4'  # color used by PySimpleGUIdef __init__(self, logfile, table='LogEntries'):
@@ -372,7 +373,7 @@ def fillcontactlogrow(table, contactlognumber, window):
     '''
     sqlstring = 'SELECT * from ContactLog WHERE ID = ? ;'
     contactlogrow = table.readrows(sqlstring, contactlognumber)
-
+    print('contactlogrow => ', contactlogrow)
     window.FindElement('_CONTACTLOGNUMBER_').Update(contactlogrow[0][0])
     window.FindElement('_CONTACTLOGCOMPANYID_').Update(contactlogrow[0][1])
     window.FindElement('_CONTACTLOGCONTACT_').Update(contactlogrow[0][2])
@@ -557,7 +558,7 @@ def newcompanyrow(table, companyrow):
 
     if table.createrow(sqlstring, newcompanyinfo):
         # sg.Popup('Created company row')
-        return true
+        return True
     else:
         # sg.Popup('FAILED to create company row')
         return False
@@ -844,6 +845,7 @@ def main():
             currentactionitem = fillactionitemlistbox(theactionitemlist,window,currentcompany)
             fillactionitemrow(theactionitemlist,currentactionitem,window)
             currentcontactlogitem = fillcontactloglistbox(thecontactlog, window, currentcompany)
+            print('currentcontactlogitem => ', currentcontactlogitem)
             fillcontactlogrow(thecontactlog, currentcontactlogitem, window)
 
             # currentcontact = fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1], window)
@@ -860,8 +862,6 @@ def main():
             if savecontactrow(thecontact, getcontactrow(values), values['_CONTACTNUMBER_']):
                 setmessage('Contact info saved', window)
         elif event == '_CONTACTLISTBOX_':
-            # sg.Popup('_CONTACTLISTBOX_', values['_CONTACTLISTBOX_'][0][1])
-            # fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
             fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1],window)
 
         elif event == '_NEWACTIONITEM_':
