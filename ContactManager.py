@@ -373,7 +373,7 @@ def fillcontactlogrow(table, contactlognumber, window):
     :param window:
     :return: True/False
     '''
-    sqlstring = 'SELECT * from ContactLog WHERE ID = ? ;'
+    sqlstring = 'SELECT * from ContactLog WHERE ID = ? ; '
     contactlogrow = table.readrows(sqlstring, contactlognumber)
     print('contactlogrow => ', contactlogrow)
     window.FindElement('_CONTACTLOGNUMBER_').Update(contactlogrow[0][0])
@@ -446,9 +446,9 @@ def savecontactrow(table, contactrow, thecontact=None):
     contactrow.append(contactrow[0])
     # print('contactrow => ', contactrow)
     if table.updaterow(sqlstring, contactrow):
-        sg.Popup('Saved company row data')
+        sg.Popup('Saved contact row data')
     else:
-        sg.Popup('FAILED to save company row data')
+        sg.Popup('FAILED to save contact row data')
         
 
 def fillcompanyrow(table, companynumber, window):
@@ -459,9 +459,10 @@ def fillcompanyrow(table, companynumber, window):
     :param window:
     :return:
     '''
-    sqlstring = 'SELECT * from Company WHERE ID = ? ;'
+    sqlstring = 'SELECT * from Company WHERE ID = ? ; '
+    print('fillcompanyrow sqlstring, companynumber =>', sqlstring, companynumber)
     companyrow = table.readrows(sqlstring, companynumber)
-    print('companyrow =>', companyrow)
+    print('fillcompanyrow companyrow =>', companyrow, companynumber)
     
     window.FindElement('_COMPANYNUMBER_').Update(companyrow[0][0])
     window.FindElement('_COMPANYNAME_').Update(companyrow[0][1])
@@ -808,7 +809,7 @@ def main():
             mainscreenlayout)
     window.Finalize()
     # window.Refresh()
-    fillscreen(window,0,0)  # fill all the fields based on the first company and the first contact in that company
+    # fillscreen(window,0,0)  # fill all the fields based on the first company and the first contact in that company
     currentcompany = fillcompanylistbox(thecompany, window)
     currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
     currentactionitem = fillactionitemlistbox(theactionitemlist,window,currentcompany)
@@ -854,7 +855,7 @@ def main():
             # currentcontact = fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1], window)
 
 
-            fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
+            # fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
 
         elif event == '_NEWCONTACT_':
             sg.Popup('_NEWCONTACT_')
