@@ -6,7 +6,6 @@ import os
 import sys
 from datetime import datetime
 
-
 # my_db_file = 'C:/Users/imlay/OneDrive/Documents/my-CRM-AppData.db'
 my_db_file = 'my-CRM-AppData.db'
 # my_db_file = ''
@@ -62,19 +61,22 @@ class ContactTable:
 
         try:
             curr = self.conn.cursor()
-            # print('curr creation succeeded')
+            print('readrows curr creation succeeded')
             if sqlvaluelist is None:
+                # sg.Popup('readrows sqlvaluelist is None, sqlstring =>', sqlstring)
+                print('readrows sqlvaluelist is None, sqlstring =>', sqlstring)
                 curr.execute(sqlstring)
             else:
-                # print('cur.execute =>', sqlstring, sqlvaluelist)
+                # sg.Popup('readrows sqlvaluelist is NOT None',sqlstring, sqlvaluelist )
+                print('readrows cur.execute =>', sqlstring, sqlvaluelist)
                 curr.execute(sqlstring, str(sqlvaluelist))
 
-            # print('curr.execute succeeded')
+            print('readrows curr.execute succeeded')
             therecords = curr.fetchall()
-            # print('therecords => ', therecords)
+            print('readrows therecords => ', therecords)
             return therecords
         except Error as e:
-            print(e)
+            print('readrows error =>', e)
             return None
 
     def updaterow(self, sqlstring, rowdata):
@@ -96,7 +98,7 @@ class ContactTable:
             return True
         except Error as e:
             print(e)
-            print('updatelogentry FAILED(', rowdata, ')')
+            print('update entry FAILED(', rowdata, ')')
             return False
 
     def deleterow(self,sqlstring):
@@ -458,18 +460,19 @@ def fillcompanyrow(table, companynumber, window):
     :return:
     '''
     sqlstring = 'SELECT * from Company WHERE ID = ? ;'
-    contactrow = table.readrows(sqlstring, companynumber)
-
-    window.FindElement('_COMPANYNUMBER_').Update(contactrow[0][0])
-    window.FindElement('_COMPANYNAME_').Update(contactrow[0][1])
-    window.FindElement('_WEBADDRESS_').Update(contactrow[0][2])
-    window.FindElement('_STREETADDRESS1_').Update(contactrow[0][3])
-    window.FindElement('_STREETADDRESS2_').Update(contactrow[0][4])
-    window.FindElement('_CITY_').Update(contactrow[0][5])
-    window.FindElement('_STATE_').Update(contactrow[0][6])
-    window.FindElement('_ZIPCODE_').Update(contactrow[0][7])
-    window.FindElement('_NOTES_').Update(contactrow[0][8])
-    window.FindElement('_PHONE_').Update(contactrow[0][9])
+    companyrow = table.readrows(sqlstring, companynumber)
+    print('companyrow =>', companyrow)
+    
+    window.FindElement('_COMPANYNUMBER_').Update(companyrow[0][0])
+    window.FindElement('_COMPANYNAME_').Update(companyrow[0][1])
+    window.FindElement('_WEBADDRESS_').Update(companyrow[0][2])
+    window.FindElement('_STREETADDRESS1_').Update(companyrow[0][3])
+    window.FindElement('_STREETADDRESS2_').Update(companyrow[0][4])
+    window.FindElement('_CITY_').Update(companyrow[0][5])
+    window.FindElement('_STATE_').Update(companyrow[0][6])
+    window.FindElement('_ZIPCODE_').Update(companyrow[0][7])
+    window.FindElement('_NOTES_').Update(companyrow[0][8])
+    window.FindElement('_PHONE_').Update(companyrow[0][9])
 
     return companynumber
 
