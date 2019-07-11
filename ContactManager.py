@@ -61,19 +61,19 @@ class ContactTable:
 
         try:
             curr = self.conn.cursor()
-            print('readrows curr creation succeeded')
+            # print('readrows curr creation succeeded')
             if sqlvaluelist is None:
                 # sg.Popup('readrows sqlvaluelist is None, sqlstring =>', sqlstring)
-                print('readrows sqlvaluelist is None, sqlstring =>', sqlstring)
+                # print('readrows sqlvaluelist is None, sqlstring =>', sqlstring)
                 curr.execute(sqlstring)
             else:
                 # sg.Popup('readrows sqlvaluelist is NOT None',sqlstring, sqlvaluelist )
-                print('readrows cur.execute =>', sqlstring, sqlvaluelist)
-                curr.execute(sqlstring, str(sqlvaluelist))
+                # print('readrows cur.execute =>', sqlstring, ((sqlvaluelist),))
+                curr.execute(sqlstring, (sqlvaluelist,))
 
-            print('readrows curr.execute succeeded')
+            # print('readrows curr.execute succeeded')
             therecords = curr.fetchall()
-            print('readrows therecords => ', therecords)
+            # print('readrows therecords => ', therecords)
             return therecords
         except Error as e:
             print('readrows error =>', e)
