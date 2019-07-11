@@ -185,12 +185,16 @@ def fillcompanylistbox(table, window):
     '''
     sqlstr = 'SELECT CompanyName, ID FROM Company order by CompanyName;'
 
-    companyboxlist = table.readrows(sqlstr)
-    companynumber = companyboxlist[0][1]
-    # print('currentcompany =>', companynumber)
-    # print('companyboxlist =>', companyboxlist)
-    window.FindElement('_COMPANYLISTBOX_').Update(companyboxlist)
-    return companynumber
+    try:
+        companyboxlist = table.readrows(sqlstr)
+        companynumber = companyboxlist[0][1]
+        # print('currentcompany =>', companynumber)
+        # print('companyboxlist =>', companyboxlist)
+        window.FindElement('_COMPANYLISTBOX_').Update(companyboxlist)
+        return companynumber
+    except:
+        print('fillcompanylistbox FAILED')
+        return None
 
 
 def fillcontactlistbox(table,window, currentcompany):
@@ -203,12 +207,16 @@ def fillcontactlistbox(table,window, currentcompany):
     '''
     sqlstr = 'SELECT ContactName, ID FROM Contact where CompanyID = ? order by ContactName;'
 
-    contactboxlist = table.readrows(sqlstr, currentcompany)
-    contactnumber = contactboxlist[0][1]
-    # print('contactnumber', contactnumber)
-    # print('contactboxlist =>', contactboxlist)
-    window.FindElement('_CONTACTLISTBOX_').Update(contactboxlist)
-    return contactnumber
+    try:
+        contactboxlist = table.readrows(sqlstr, currentcompany)
+        contactnumber = contactboxlist[0][1]
+        # print('contactnumber', contactnumber)
+        # print('contactboxlist =>', contactboxlist)
+        window.FindElement('_CONTACTLISTBOX_').Update(contactboxlist)
+        return contactnumber
+    except:
+        print('fillcontactlistbox FAILED')
+        return None
 
 def fillcontactloglistbox(table,window, currentcompany):
     '''
@@ -220,12 +228,16 @@ def fillcontactloglistbox(table,window, currentcompany):
     '''
     sqlstr = 'SELECT DateTime, Purpose, ID FROM ContactLog where CompanyID = ? order by DateTime;'
 
-    contactlogboxlist = table.readrows(sqlstr, currentcompany)
-    contactlognumber = contactlogboxlist[0][2]
-    # print('contactlognumber', contactlognumber)
-    # print('contactlogboxlist =>', contactlogboxlist)
-    window.FindElement('_CONTACTLOGLISTBOX_').Update(contactlogboxlist)
-    return contactlognumber
+    try:
+        contactlogboxlist = table.readrows(sqlstr, currentcompany)
+        contactlognumber = contactlogboxlist[0][2]
+        # print('contactlognumber', contactlognumber)
+        # print('contactlogboxlist =>', contactlogboxlist)
+        window.FindElement('_CONTACTLOGLISTBOX_').Update(contactlogboxlist)
+        return contactlognumber
+    except:
+        print('fillcontactloglistbox FAILED')
+        return None
 
 def getactionitemrow(window):
 
@@ -244,29 +256,34 @@ def fillcontactrow(table, contactnumber, window):
     :return: True/False
     '''
     sqlstring = 'SELECT * from Contact WHERE ID = ? ;'
-    contactrow = table.readrows(sqlstring, contactnumber)
 
-    window.FindElement('_CONTACTNUMBER_').Update(contactrow[0][0])
-    window.FindElement('_CONTACTNAME_').Update(contactrow[0][1])
-    window.FindElement('_CONTACTLASTNAME_').Update(contactrow[0][2])
-    window.FindElement('_CONTACTFIRSTNAME_').Update(contactrow[0][3])
-    window.FindElement('_CONTACTJOBTITLE_').Update(contactrow[0][4])
-    window.FindElement('_CONTACTCOMPANYID_').Update(contactrow[0][5])
-    window.FindElement('_CONTACTWORKPHONE_').Update(contactrow[0][6])
-    window.FindElement('_CONTACTCELLPHONE_').Update(contactrow[0][7])
-    window.FindElement('_CONTACTWORKEMAIL_').Update(contactrow[0][8])
-    window.FindElement('_CONTACTPERSONALEMAIL_').Update(contactrow[0][9])
-    window.FindElement('_CONTACTPICTURE_').Update(contactrow[0][11])
-    window.FindElement('_CONTACTLASTUPDATED_').Update(contactrow[0][12])
-    window.FindElement('_CONTACTNOTES_').Update(contactrow[0][10])
+    try:
+        contactrow = table.readrows(sqlstring, contactnumber)
 
-    sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
-    contactcompany = table.readrows(sqlstring, contactrow[0][5])
-    window.FindElement('_CONTACTCOMPANY_').Update(contactcompany[0][0])
+        window.FindElement('_CONTACTNUMBER_').Update(contactrow[0][0])
+        window.FindElement('_CONTACTNAME_').Update(contactrow[0][1])
+        window.FindElement('_CONTACTLASTNAME_').Update(contactrow[0][2])
+        window.FindElement('_CONTACTFIRSTNAME_').Update(contactrow[0][3])
+        window.FindElement('_CONTACTJOBTITLE_').Update(contactrow[0][4])
+        window.FindElement('_CONTACTCOMPANYID_').Update(contactrow[0][5])
+        window.FindElement('_CONTACTWORKPHONE_').Update(contactrow[0][6])
+        window.FindElement('_CONTACTCELLPHONE_').Update(contactrow[0][7])
+        window.FindElement('_CONTACTWORKEMAIL_').Update(contactrow[0][8])
+        window.FindElement('_CONTACTPERSONALEMAIL_').Update(contactrow[0][9])
+        window.FindElement('_CONTACTPICTURE_').Update(contactrow[0][11])
+        window.FindElement('_CONTACTLASTUPDATED_').Update(contactrow[0][12])
+        window.FindElement('_CONTACTNOTES_').Update(contactrow[0][10])
 
-    window.Refresh()
+        sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
+        contactcompany = table.readrows(sqlstring, contactrow[0][5])
+        window.FindElement('_CONTACTCOMPANY_').Update(contactcompany[0][0])
 
-    return True
+        window.Refresh()
+
+        return True
+    except:
+        print('fillcontactrow FAILED')
+        return False
 
 def fillactionitemlistbox(table,window, currentcompany):
     '''
@@ -278,14 +295,18 @@ def fillactionitemlistbox(table,window, currentcompany):
     '''
     sqlstr = 'SELECT CreatedDate, ActionItem, ID FROM ActionItemList where CompanyID = ? order by CreatedDate;'
 
-    # print('sqlstr, currentcompany =>', sqlstr, currentcompany)
-    actionitemboxlist = table.readrows(sqlstr, currentcompany)
-    actionitemnumber = actionitemboxlist[0][2]
-    # print('actionitemnumber', actionitemnumber)
-    # print('actionitemboxlist =>', actionitemboxlist)
-    window.FindElement('_ACTIONITEMLISTBOX_').Update(actionitemboxlist)
+    try:
+        # print('sqlstr, currentcompany =>', sqlstr, currentcompany)
+        actionitemboxlist = table.readrows(sqlstr, currentcompany)
+        actionitemnumber = actionitemboxlist[0][2]
+        # print('actionitemnumber', actionitemnumber)
+        # print('actionitemboxlist =>', actionitemboxlist)
+        window.FindElement('_ACTIONITEMLISTBOX_').Update(actionitemboxlist)
 
-    return actionitemnumber
+        return actionitemnumber
+    except:
+        print('fillactionitemlistbox FAILED')
+        return None
 
 
 def fillactionitemrow(table, actionitemnumber, window):
@@ -297,23 +318,28 @@ def fillactionitemrow(table, actionitemnumber, window):
     :return: True/False
     '''
     sqlstring = 'SELECT * from ActionItemList WHERE ID = ? ;'
-    actionitemrow = table.readrows(sqlstring, actionitemnumber)
 
-    window.FindElement('_ACTIONITEMNUMBER_').Update(actionitemrow[0][0])
-    window.FindElement('_ACTIONITEMLISTCOMPANYID_').Update(actionitemrow[0][1])
-    window.FindElement('_ACTIONITEMLISTCREATED_').Update(actionitemrow[0][2])
-    window.FindElement('_ACTIONITEMLISTDUEDATE').Update(actionitemrow[0][3])
-    window.FindElement('_ACTIONITEMLISTACTIONITEM_').Update(actionitemrow[0][4])
-    window.FindElement('_ACTIONITEMLISTNOTES_').Update(actionitemrow[0][5])
-    window.FindElement('_ACTIONITEMLISTSTATUS_').Update(actionitemrow[0][6])
-    window.FindElement('_ACTIONITEMLISTSTATUSDATE_').Update(actionitemrow[0][7])
+    try:
+        actionitemrow = table.readrows(sqlstring, actionitemnumber)
 
-    sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
+        window.FindElement('_ACTIONITEMNUMBER_').Update(actionitemrow[0][0])
+        window.FindElement('_ACTIONITEMLISTCOMPANYID_').Update(actionitemrow[0][1])
+        window.FindElement('_ACTIONITEMLISTCREATED_').Update(actionitemrow[0][2])
+        window.FindElement('_ACTIONITEMLISTDUEDATE').Update(actionitemrow[0][3])
+        window.FindElement('_ACTIONITEMLISTACTIONITEM_').Update(actionitemrow[0][4])
+        window.FindElement('_ACTIONITEMLISTNOTES_').Update(actionitemrow[0][5])
+        window.FindElement('_ACTIONITEMLISTSTATUS_').Update(actionitemrow[0][6])
+        window.FindElement('_ACTIONITEMLISTSTATUSDATE_').Update(actionitemrow[0][7])
 
-    actionitemcompany = table.readrows(sqlstring, actionitemrow[0][1])
-    window.FindElement('_ACTIONITEMLISTCOMPANYNAME_').Update(actionitemcompany[0][0])
+        sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
 
-    window.Refresh()
+        actionitemcompany = table.readrows(sqlstring, actionitemrow[0][1])
+        window.FindElement('_ACTIONITEMLISTCOMPANYNAME_').Update(actionitemcompany[0][0])
+
+        window.Refresh()
+    except:
+        print('fillactionitemrow FAILED')
+        window.Refresh()
     
 def getactionitemrow(values):
     '''
@@ -374,21 +400,26 @@ def fillcontactlogrow(table, contactlognumber, window):
     :return: True/False
     '''
     sqlstring = 'SELECT * from ContactLog WHERE ID = ? ; '
-    contactlogrow = table.readrows(sqlstring, contactlognumber)
-    print('contactlogrow => ', contactlogrow)
-    window.FindElement('_CONTACTLOGNUMBER_').Update(contactlogrow[0][0])
-    window.FindElement('_CONTACTLOGCOMPANYID_').Update(contactlogrow[0][1])
-    window.FindElement('_CONTACTLOGCONTACT_').Update(contactlogrow[0][2])
-    window.FindElement('_CONTACTLOGDATETIME_').Update(contactlogrow[0][3])
-    window.FindElement('_CONTACTLOGPURPOSE_').Update(contactlogrow[0][4])
-    window.FindElement('_CONTACTLOGOUTCOME_').Update(contactlogrow[0][5])
-    window.FindElement('_CONTACTLOGFOLLOWUP_').Update(contactlogrow[0][6])
 
-    sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
-    contactlogrowcompany = table.readrows(sqlstring, contactlogrow[0][1])
-    window.FindElement('_CONTACTLOGCOMPANY_').Update(contactlogrowcompany[0][0])
+    try:
+        contactlogrow = table.readrows(sqlstring, contactlognumber)
+        # print('contactlogrow => ', contactlogrow)
+        window.FindElement('_CONTACTLOGNUMBER_').Update(contactlogrow[0][0])
+        window.FindElement('_CONTACTLOGCOMPANYID_').Update(contactlogrow[0][1])
+        window.FindElement('_CONTACTLOGCONTACT_').Update(contactlogrow[0][2])
+        window.FindElement('_CONTACTLOGDATETIME_').Update(contactlogrow[0][3])
+        window.FindElement('_CONTACTLOGPURPOSE_').Update(contactlogrow[0][4])
+        window.FindElement('_CONTACTLOGOUTCOME_').Update(contactlogrow[0][5])
+        window.FindElement('_CONTACTLOGFOLLOWUP_').Update(contactlogrow[0][6])
 
-    window.Refresh()
+        sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
+        contactlogrowcompany = table.readrows(sqlstring, contactlogrow[0][1])
+        window.FindElement('_CONTACTLOGCOMPANY_').Update(contactlogrowcompany[0][0])
+
+        window.Refresh()
+    except:
+        print('fillcontactlogrow FAILED')
+        window.Refresh()
 
 
 def getcontactrow(values):
@@ -460,22 +491,27 @@ def fillcompanyrow(table, companynumber, window):
     :return:
     '''
     sqlstring = 'SELECT * from Company WHERE ID = ? ; '
-    print('fillcompanyrow sqlstring, companynumber =>', sqlstring, companynumber)
-    companyrow = table.readrows(sqlstring, companynumber)
-    print('fillcompanyrow companyrow =>', companyrow, companynumber)
-    
-    window.FindElement('_COMPANYNUMBER_').Update(companyrow[0][0])
-    window.FindElement('_COMPANYNAME_').Update(companyrow[0][1])
-    window.FindElement('_WEBADDRESS_').Update(companyrow[0][2])
-    window.FindElement('_STREETADDRESS1_').Update(companyrow[0][3])
-    window.FindElement('_STREETADDRESS2_').Update(companyrow[0][4])
-    window.FindElement('_CITY_').Update(companyrow[0][5])
-    window.FindElement('_STATE_').Update(companyrow[0][6])
-    window.FindElement('_ZIPCODE_').Update(companyrow[0][7])
-    window.FindElement('_NOTES_').Update(companyrow[0][8])
-    window.FindElement('_PHONE_').Update(companyrow[0][9])
 
-    return companynumber
+    try:
+        # print('fillcompanyrow sqlstring, companynumber =>', sqlstring, companynumber)
+        companyrow = table.readrows(sqlstring, companynumber)
+        # print('fillcompanyrow companyrow =>', companyrow, companynumber)
+    
+        window.FindElement('_COMPANYNUMBER_').Update(companyrow[0][0])
+        window.FindElement('_COMPANYNAME_').Update(companyrow[0][1])
+        window.FindElement('_WEBADDRESS_').Update(companyrow[0][2])
+        window.FindElement('_STREETADDRESS1_').Update(companyrow[0][3])
+        window.FindElement('_STREETADDRESS2_').Update(companyrow[0][4])
+        window.FindElement('_CITY_').Update(companyrow[0][5])
+        window.FindElement('_STATE_').Update(companyrow[0][6])
+        window.FindElement('_ZIPCODE_').Update(companyrow[0][7])
+        window.FindElement('_NOTES_').Update(companyrow[0][8])
+        window.FindElement('_PHONE_').Update(companyrow[0][9])
+
+        return companynumber
+    except:
+        print('fillcompanyrow FAILED')
+        return None
 
 
 def getcompanyrow(values):
@@ -543,8 +579,8 @@ def newcompanyrow(table, companyrow):
     '''
 
     newcompanyinfo = companyrow[1:]
-    print('companyrow => ', companyrow)
-    print('newcompanyinfo => ', newcompanyinfo)
+    # print('companyrow => ', companyrow)
+    # print('newcompanyinfo => ', newcompanyinfo)
 
     sqlstring = '''
     INSERT into Company (
@@ -849,13 +885,7 @@ def main():
             currentactionitem = fillactionitemlistbox(theactionitemlist,window,currentcompany)
             fillactionitemrow(theactionitemlist,currentactionitem,window)
             currentcontactlogitem = fillcontactloglistbox(thecontactlog, window, currentcompany)
-            print('currentcontactlogitem => ', currentcontactlogitem)
             fillcontactlogrow(thecontactlog, currentcontactlogitem, window)
-
-            # currentcontact = fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1], window)
-
-
-            # fillscreen(window,values['_COMPANYLISTBOX_'],values['_CONTACTLISTBOX_'])
 
         elif event == '_NEWCONTACT_':
             sg.Popup('_NEWCONTACT_')
