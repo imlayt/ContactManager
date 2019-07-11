@@ -247,6 +247,45 @@ def getactionitemrow(window):
     '''
     pass
 
+def clearcontactrow(window):
+    '''
+
+    :param table:
+    :param contactnumber:
+    :param window:
+    :return: True/False
+    '''
+    sqlstring = 'SELECT * from Contact WHERE ID = ? ;'
+
+    try:
+        window.FindElement('_CONTACTNUMBER_').Update('')
+        window.FindElement('_CONTACTNAME_').Update('')
+        window.FindElement('_CONTACTLASTNAME_').Update('')
+        window.FindElement('_CONTACTFIRSTNAME_').Update('')
+        window.FindElement('_CONTACTJOBTITLE_').Update('')
+        window.FindElement('_CONTACTCOMPANYID_').Update('')
+        window.FindElement('_CONTACTWORKPHONE_').Update('')
+        window.FindElement('_CONTACTCELLPHONE_').Update('')
+        window.FindElement('_CONTACTWORKEMAIL_').Update('')
+        window.FindElement('_CONTACTPERSONALEMAIL_').Update('')
+        window.FindElement('_CONTACTPICTURE_').Update('')
+        window.FindElement('_CONTACTLASTUPDATED_').Update('')
+        window.FindElement('_CONTACTNOTES_').Update('')
+
+        # sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
+        # contactcompany = values['_COMPANYNUMBER_']
+        # window.FindElement('_CONTACTCOMPANY_').Update(contactcompany)
+
+        window.FindElement('_CONTACTCOMPANY_').Update('')
+
+        window.Refresh()
+
+        return True
+    except:
+        print('fillcontact FAILED')
+        return False
+
+
 def fillcontactrow(table, contactnumber, window):
     '''
 
@@ -282,6 +321,7 @@ def fillcontactrow(table, contactnumber, window):
 
         return True
     except:
+        clearcontactrow(window)
         print('fillcontactrow FAILED')
         return False
 
@@ -435,7 +475,12 @@ def getcontactrow(values):
     contactrow.append(values['_CONTACTLASTNAME_'])
     contactrow.append(values['_CONTACTFIRSTNAME_'])
     contactrow.append(values['_CONTACTJOBTITLE_'])
-    contactrow.append(values['_CONTACTCOMPANYID_'])
+
+    if len(values['_CONTACTCOMPANYID_']) == 0:
+        contactrow.append(values['_COMPANYNUMBER_'])
+    else:
+        contactrow.append(values['_CONTACTCOMPANYID_'])
+
     contactrow.append(values['_CONTACTWORKPHONE_'])
     contactrow.append(values['_CONTACTCELLPHONE_'])
     contactrow.append(values['_CONTACTWORKEMAIL_'])
@@ -445,6 +490,44 @@ def getcontactrow(values):
     contactrow.append(values['_CONTACTLASTUPDATED_'])
 
     return contactrow
+
+
+def newcontactrow(table, contactrow):
+    '''
+
+    :param table:
+    :param companyrow:
+    :param thecompany:
+    :return:
+    '''
+
+    sqlstring = '''
+    INSERT INTO Contact( 
+    ContactName = ?,
+    LastName = ?,
+    FirstName = ?,
+    JobTitle = ?,
+    CompanyID = ?,
+    WorkPhone = ?,
+    CellPhone = ?,
+    WorkEmail = ?,
+    PersonalEmail = ?,
+    Notes = ?,
+    Picture = ?,
+    LastUpdated = ?
+
+    WHERE ID = ?
+    '''
+
+    newcontactinfo = contactrow[1:]
+
+    if table.createrow(sqlstring, newcontactinfo):
+        sg.Popup('Created contact row')
+        return True
+    else:
+        sg.Popup('FAILED to create contact row')
+        return False
+
 
 def savecontactrow(table, contactrow, thecontact=None):
     '''
@@ -889,8 +972,8 @@ def main():
 
         elif event == '_NEWCONTACT_':
             sg.Popup('_NEWCONTACT_')
-            if thecontact.createrow(sql_add_contact, getcontactrow(window)):
-                setmessage('New contact added', window)
+            if clearcontactrow(window):
+                setmessage('Contact cleared', window)
         elif event == '_SAVECONTACT_':
             # sg.Popup('_SAVECONTACT_')
             if savecontactrow(thecontact, getcontactrow(values), values['_CONTACTNUMBER_']):
