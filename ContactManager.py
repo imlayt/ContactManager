@@ -39,12 +39,12 @@ class ContactTable:
 
         try:
             curr = self.conn.cursor()
-            # print('curr creation succeeded')
-            # print('sqlstring =>', sqlstring)
+            print('curr creation succeeded')
+            print('sqlstring =>', sqlstring)
             curr.execute(sqlstring, rowdata)
             # commit the changes
             self.conn.commit()
-            # print('curr.execute succeeded')
+            print('commit succeeded')
             return True
         except Error as e:
             print(e)
@@ -503,26 +503,26 @@ def newcontactrow(table, contactrow):
 
     sqlstring = '''
     INSERT INTO Contact( 
-    ContactName = ?,
-    LastName = ?,
-    FirstName = ?,
-    JobTitle = ?,
-    CompanyID = ?,
-    WorkPhone = ?,
-    CellPhone = ?,
-    WorkEmail = ?,
-    PersonalEmail = ?,
-    Notes = ?,
-    Picture = ?,
-    LastUpdated = ?
-
-    WHERE ID = ?
+    ContactName,
+    LastName,
+    FirstName,
+    JobTitle,
+    CompanyID,
+    WorkPhone,
+    CellPhone,
+    WorkEmail,
+    PersonalEmail,
+    Notes,
+    Picture,
+    LastUpdated )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     '''
 
     newcontactinfo = contactrow[1:]
 
+    # print('***********newcontactinfo =>', newcontactinfo)
     if table.createrow(sqlstring, newcontactinfo):
-        sg.Popup('Created contact row')
+        # sg.Popup('Created contact row')
         return True
     else:
         sg.Popup('FAILED to create contact row')
@@ -560,7 +560,8 @@ def savecontactrow(table, contactrow, thecontact=None):
     contactrow.append(contactrow[0])
     # print('contactrow => ', contactrow)
     if table.updaterow(sqlstring, contactrow):
-        sg.Popup('Saved contact row data')
+        pass
+        # sg.Popup('Saved contact row data')
     else:
         sg.Popup('FAILED to save contact row data')
         
@@ -971,11 +972,18 @@ def main():
             fillcontactlogrow(thecontactlog, currentcontactlogitem, window)
 
         elif event == '_NEWCONTACT_':
-            sg.Popup('_NEWCONTACT_')
+            # sg.Popup('_NEWCONTACT_')
             if clearcontactrow(window):
                 setmessage('Contact cleared', window)
         elif event == '_SAVECONTACT_':
             # sg.Popup('_SAVECONTACT_')
+            if len(values['_CONTACTNUMBER_']) == 0:
+                if newcontactrow( thecontact,getcontactrow(values)):
+                    currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
+                    setmessage('New contact added', window)
+            elif savecontactrow(thecontact,getcontactrow(values),values['_CONTACTNUMBER_']):
+                setmessage('Company info saved', window)
+            
             if savecontactrow(thecontact, getcontactrow(values), values['_CONTACTNUMBER_']):
                 setmessage('Contact info saved', window)
         elif event == '_CONTACTLISTBOX_':
