@@ -218,6 +218,7 @@ def fillcontactlistbox(table,window, currentcompany):
         print('fillcontactlistbox FAILED')
         return None
 
+
 def fillcontactloglistbox(table,window, currentcompany):
     '''
 
@@ -238,14 +239,6 @@ def fillcontactloglistbox(table,window, currentcompany):
     except:
         print('fillcontactloglistbox FAILED')
         return None
-
-def getactionitemrow(window):
-
-    '''
-    :param window:
-    :return:
-    '''
-    pass
 
 def clearcontactrow(window):
     '''
@@ -380,7 +373,35 @@ def fillactionitemrow(table, actionitemnumber, window):
     except:
         print('fillactionitemrow FAILED')
         window.Refresh()
-    
+
+
+def clearactionitemrow(window):
+    '''
+
+    :param table:
+    :param actionitemnumber:
+    :param window:
+    :return: True/False
+    '''
+
+    try:
+        window.FindElement('_ACTIONITEMNUMBER_').Update('')
+        window.FindElement('_ACTIONITEMLISTCOMPANYID_').Update('')
+        window.FindElement('_ACTIONITEMLISTCREATED_').Update('')
+        window.FindElement('_ACTIONITEMLISTDUEDATE').Update('')
+        window.FindElement('_ACTIONITEMLISTACTIONITEM_').Update('')
+        window.FindElement('_ACTIONITEMLISTNOTES_').Update('')
+        window.FindElement('_ACTIONITEMLISTSTATUS_').Update('')
+        window.FindElement('_ACTIONITEMLISTSTATUSDATE_').Update('')
+
+        window.FindElement('_ACTIONITEMLISTCOMPANYNAME_').Update('')
+
+        window.Refresh()
+    except:
+        print('clearactionitemrow FAILED')
+        window.Refresh()
+
+
 def getactionitemrow(values):
     '''
 
@@ -390,7 +411,12 @@ def getactionitemrow(values):
     actionitemrow = []
 
     actionitemrow.append(values['_ACTIONITEMNUMBER_'])
-    actionitemrow.append(values['_ACTIONITEMLISTCOMPANYID_'])
+
+    if len(values['_ACTIONITEMLISTCOMPANYID_']) == 0:
+        actionitemrow.append(values['_COMPANYNUMBER_'])
+    else:
+        actionitemrow.append(values['_ACTIONITEMLISTCOMPANYID_'])
+
     actionitemrow.append(values['_ACTIONITEMLISTCREATED_'])
     actionitemrow.append(values['_ACTIONITEMLISTDUEDATE'])
     actionitemrow.append(values['_ACTIONITEMLISTACTIONITEM_'])
@@ -431,6 +457,41 @@ def saveactionitemrow(table, actionitemrow, theactionitem=None):
     else:
         sg.Popup('FAILED to save action item row data')
 
+
+def newactionitemrow(table, actionitemrow, theactionitem=None):
+    '''
+
+    :param table:
+    :param companyrow:
+    :param thecompany:
+    :return:
+    '''
+
+    sqlstring = '''
+    INSERT INTO ActionItemList (  
+    CompanyID,
+    CreatedDate,
+    DueDate,
+    ActionItem,
+    Notes,
+    Status,
+    StatusDate )
+
+    VALUES( ?, ?, ?, ?, ?, ?, ? )
+    '''
+
+    newactioniteminfo = actionitemrow[1:]
+
+    if table.createrow(sqlstring, newactioniteminfo):
+        # sg.Popup('Created contact row')
+        return True
+    else:
+        sg.Popup('FAILED to create action item row')
+        return False
+
+
+
+
 def fillcontactlogrow(table, contactlognumber, window):
     '''
 
@@ -460,6 +521,34 @@ def fillcontactlogrow(table, contactlognumber, window):
     except:
         print('fillcontactlogrow FAILED')
         window.Refresh()
+
+
+
+def clearcontactlogrow(window):
+    '''
+
+    :param table:
+    :param contactlognumber:
+    :param window:
+    :return: True/False
+    '''
+
+    try:
+        window.FindElement('_CONTACTLOGNUMBER_').Update('')
+        window.FindElement('_CONTACTLOGCOMPANYID_').Update('')
+        window.FindElement('_CONTACTLOGCONTACT_').Update('')
+        window.FindElement('_CONTACTLOGDATETIME_').Update('')
+        window.FindElement('_CONTACTLOGPURPOSE_').Update('')
+        window.FindElement('_CONTACTLOGOUTCOME_').Update('')
+        window.FindElement('_CONTACTLOGFOLLOWUP_').Update('')
+
+        window.FindElement('_CONTACTLOGCOMPANY_').Update('')
+
+        window.Refresh()
+    except:
+        print('clearcontactlogrow FAILED')
+        window.Refresh()
+
 
 
 def getcontactrow(values):
@@ -527,6 +616,43 @@ def newcontactrow(table, contactrow):
     else:
         sg.Popup('FAILED to create contact row')
         return False
+
+
+def savecontactrow(table, contactrow, thecontact=None):
+    '''
+
+    :param table:
+    :param companyrow:
+    :param thecompany:
+    :return:
+    '''
+
+    sqlstring = '''
+    UPDATE Contact SET 
+    ID=?, 
+    ContactName = ?,
+    LastName = ?,
+    FirstName = ?,
+    JobTitle = ?,
+    CompanyID = ?,
+    WorkPhone = ?,
+    CellPhone = ?,
+    WorkEmail = ?,
+    PersonalEmail = ?,
+    Notes = ?,
+    Picture = ?,
+    LastUpdated = ?
+
+    WHERE ID = ?
+    '''
+    # print('contactrow[0] =>', contactrow[0])
+    contactrow.append(contactrow[0])
+    # print('contactrow => ', contactrow)
+    if table.updaterow(sqlstring, contactrow):
+        pass
+        # sg.Popup('Saved contact row data')
+    else:
+        sg.Popup('FAILED to save contact row data')
 
 
 def savecontactrow(table, contactrow, thecontact=None):
@@ -718,7 +844,12 @@ def getcontactlogrow(values):
     contactlogrow = []
 
     contactlogrow.append(values['_CONTACTLOGNUMBER_'])
-    contactlogrow.append(values['_CONTACTLOGCOMPANYID_'])
+
+    if len(values['_CONTACTLOGCOMPANYID_']) == 0:
+        contactlogrow.append(values['_COMPANYNUMBER_'])
+    else:
+        contactlogrow.append(values['_CONTACTLOGCOMPANYID_'])
+
     contactlogrow.append(values['_CONTACTLOGCONTACT_'])
     contactlogrow.append(values['_CONTACTLOGDATETIME_'])
     contactlogrow.append(values['_CONTACTLOGPURPOSE_'])
@@ -726,6 +857,9 @@ def getcontactlogrow(values):
     contactlogrow.append(values['_CONTACTLOGFOLLOWUP_'])
 
     return contactlogrow
+
+
+
 
 
 def savecontactlogrow(table, contactlogrow, thecontactlog=None):
@@ -755,6 +889,37 @@ def savecontactlogrow(table, contactlogrow, thecontactlog=None):
         sg.Popup('Saved company row data')
     else:
         sg.Popup('FAILED to save contact log row data')
+
+
+
+def newcontactlogrow(table, contactlogrow):
+    '''
+
+    :param table:
+    :param contactlogrow:
+    :param thecontactlog:
+    :return:
+    '''
+
+    sqlstring = '''
+    INSERT INTO ContactLog ( 
+    CompanyID,
+    ContactID,
+    DateTime,
+    Purpose,
+    Outcome,
+    FollowUp )
+    VALUES ( ?, ?, ?, ?, ?, ? )
+    '''
+
+    newcontactloginfo = contactlogrow[1:]
+
+    if table.createrow(sqlstring, newcontactloginfo):
+        # sg.Popup('Created contact row')
+        return True
+    else:
+        sg.Popup('FAILED to create contact row')
+        return False
 
 
 def main():
@@ -982,7 +1147,7 @@ def main():
                     currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
                     setmessage('New contact added', window)
             elif savecontactrow(thecontact,getcontactrow(values),values['_CONTACTNUMBER_']):
-                setmessage('Company info saved', window)
+                setmessage('Contact info saved', window)
             
             if savecontactrow(thecontact, getcontactrow(values), values['_CONTACTNUMBER_']):
                 setmessage('Contact info saved', window)
@@ -990,20 +1155,29 @@ def main():
             fillcontactrow(thecontact, values['_CONTACTLISTBOX_'][0][1],window)
 
         elif event == '_NEWACTIONITEM_':
-            sg.Popup('_NEWACTIONITEM_')
+            clearactionitemrow(window)
         elif event == '_SAVEACTIONITEM_':
             # sg.Popup('_SAVEACTIONITEM_')
-            if saveactionitemrow(theactionitemlist, getactionitemrow(values), values['_ACTIONITEMNUMBER_']):
-                setmessage('Action Item info saved', window)
+            if len(values['_ACTIONITEMNUMBER_']) == 0:
+                if newactionitemrow( theactionitemlist,getactionitemrow(values)):
+                    currentactionitem = fillactionitemlistbox(theactionitemlist, window, currentcompany)
+                    setmessage('New actionitem added', window)
+            elif saveactionitemrow(theactionitemlist,getactionitemrow(values),values['_ACTIONITEMNUMBER_']):
+                setmessage('Action item info saved', window)
         elif event == '_ACTIONITEMLISTBOX_':
             fillactionitemrow(theactionitemlist, values['_ACTIONITEMLISTBOX_'][0][2],window)
 
         elif event == '_NEWCONTACTLOGITETM_':
-            sg.Popup('_NEWCONTACTLOGITETM_')
+            clearcontactlogrow(window)
         elif event == '_SAVECONTACTLOG_':
-            # sg.Popup('_SAVECONTACTLOG_')
-            if savecontactlogrow(thecontactlog, getcontactlogrow(values), values['_CONTACTLOGNUMBER_']):
-                setmessage('Contact log info saved', window)
+            # sg.Popup('_SAVECONTACT_')
+            if len(values['_CONTACTLOGNUMBER_'])==0:
+                if newcontactlogrow(thecontactlog, getcontactlogrow(values)):
+                    currentcontactlog = fillcontactloglistbox(thecontactlog, window, currentcompany)
+                    setmessage('New contactlog added', window)
+            elif savecontactlogrow(thecontactlog, getcontactlogrow(values), values['_CONTACTLOGNUMBER_']):
+                setmessage('Company info saved', window)
+
         elif event == '_CONTACTLOGLISTBOX_':
             fillcontactlogrow(thecontactlog, values['_CONTACTLOGLISTBOX_'][0][2],window)
 
