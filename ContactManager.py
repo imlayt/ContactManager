@@ -39,12 +39,12 @@ class ContactTable:
 
         try:
             curr = self.conn.cursor()
-            print('curr creation succeeded')
-            print('sqlstring =>', sqlstring)
+            # print('curr creation succeeded')
+            # print('sqlstring =>', sqlstring)
             curr.execute(sqlstring, rowdata)
             # commit the changes
             self.conn.commit()
-            print('commit succeeded')
+            # print('commit succeeded')
             return True
         except Error as e:
             print(e)
@@ -387,7 +387,7 @@ def clearactionitemrow(window):
     try:
         window.FindElement('_ACTIONITEMNUMBER_').Update('')
         window.FindElement('_ACTIONITEMLISTCOMPANYID_').Update('')
-        window.FindElement('_ACTIONITEMLISTCREATED_').Update('')
+        window.FindElement('_ACTIONITEMLISTCREATED_').Update(f'{datetime.now():%Y-%m-%d %H:%M}')
         window.FindElement('_ACTIONITEMLISTDUEDATE').Update('')
         window.FindElement('_ACTIONITEMLISTACTIONITEM_').Update('')
         window.FindElement('_ACTIONITEMLISTNOTES_').Update('')
@@ -422,7 +422,11 @@ def getactionitemrow(values):
     actionitemrow.append(values['_ACTIONITEMLISTACTIONITEM_'])
     actionitemrow.append(values['_ACTIONITEMLISTNOTES_'])
     actionitemrow.append(values['_ACTIONITEMLISTSTATUS_'])
-    actionitemrow.append(values['_ACTIONITEMLISTSTATUSDATE_'])
+    actionitemrow.append(f'{datetime.now():%Y-%m-%d %H:%M}')
+
+    # actionitemrow.append(values['_ACTIONITEMLISTSTATUSDATE_'])
+
+
 
     return actionitemrow
 
@@ -453,7 +457,8 @@ def saveactionitemrow(table, actionitemrow, theactionitem=None):
     actionitemrow.append(actionitemrow[0])
     # print('actionitemrow => ', actionitemrow)
     if table.updaterow(sqlstring, actionitemrow):
-        sg.Popup('Saved action item row data')
+        # sg.Popup('Saved action item row data')
+        pass
     else:
         sg.Popup('FAILED to save action item row data')
 
@@ -537,7 +542,7 @@ def clearcontactlogrow(window):
         window.FindElement('_CONTACTLOGNUMBER_').Update('')
         window.FindElement('_CONTACTLOGCOMPANYID_').Update('')
         window.FindElement('_CONTACTLOGCONTACT_').Update('')
-        window.FindElement('_CONTACTLOGDATETIME_').Update('')
+        window.FindElement('_CONTACTLOGDATETIME_').Update(f'{datetime.now():%Y-%m-%d %H:%M}')
         window.FindElement('_CONTACTLOGPURPOSE_').Update('')
         window.FindElement('_CONTACTLOGOUTCOME_').Update('')
         window.FindElement('_CONTACTLOGFOLLOWUP_').Update('')
@@ -576,7 +581,8 @@ def getcontactrow(values):
     contactrow.append(values['_CONTACTPERSONALEMAIL_'])
     contactrow.append(values['_CONTACTNOTES_'])
     contactrow.append(values['_CONTACTPICTURE_'])
-    contactrow.append(values['_CONTACTLASTUPDATED_'])
+    contactrow.append(f'{datetime.now():%Y-%m-%d %H:%M}')
+    # contactrow.append(values['_CONTACTLASTUPDATED_'])
 
     return contactrow
 
@@ -851,10 +857,20 @@ def getcontactlogrow(values):
         contactlogrow.append(values['_CONTACTLOGCOMPANYID_'])
 
     contactlogrow.append(values['_CONTACTLOGCONTACT_'])
-    contactlogrow.append(values['_CONTACTLOGDATETIME_'])
+
+    if len(values['_CONTACTLOGDATETIME_']) == 0:
+        contactlogrow.append(f'{datetime.now():%Y-%m-%d %H:%M}')
+    else:
+        contactlogrow.append(values['_CONTACTLOGDATETIME_'])
+
     contactlogrow.append(values['_CONTACTLOGPURPOSE_'])
     contactlogrow.append(values['_CONTACTLOGOUTCOME_'])
     contactlogrow.append(values['_CONTACTLOGFOLLOWUP_'])
+
+    # from datetime import datetime
+    #
+    # date_string = f'{datetime.now():%Y-%m-%d %H:%M:%S%z}'
+
 
     return contactlogrow
 
@@ -1148,6 +1164,8 @@ def main():
                     setmessage('New contact added', window)
             elif savecontactrow(thecontact,getcontactrow(values),values['_CONTACTNUMBER_']):
                 setmessage('Contact info saved', window)
+            currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
+            fillcontactrow(thecontact, currentcontact, window)
             
             if savecontactrow(thecontact, getcontactrow(values), values['_CONTACTNUMBER_']):
                 setmessage('Contact info saved', window)
@@ -1157,13 +1175,14 @@ def main():
         elif event == '_NEWACTIONITEM_':
             clearactionitemrow(window)
         elif event == '_SAVEACTIONITEM_':
-            # sg.Popup('_SAVEACTIONITEM_')
             if len(values['_ACTIONITEMNUMBER_']) == 0:
                 if newactionitemrow( theactionitemlist,getactionitemrow(values)):
                     currentactionitem = fillactionitemlistbox(theactionitemlist, window, currentcompany)
                     setmessage('New actionitem added', window)
             elif saveactionitemrow(theactionitemlist,getactionitemrow(values),values['_ACTIONITEMNUMBER_']):
                 setmessage('Action item info saved', window)
+            currentactionitem = fillactionitemlistbox(theactionitemlist, window, currentcompany)
+            fillactionitemrow(theactionitemlist, currentactionitem, window)
         elif event == '_ACTIONITEMLISTBOX_':
             fillactionitemrow(theactionitemlist, values['_ACTIONITEMLISTBOX_'][0][2],window)
 
@@ -1177,6 +1196,8 @@ def main():
                     setmessage('New contactlog added', window)
             elif savecontactlogrow(thecontactlog, getcontactlogrow(values), values['_CONTACTLOGNUMBER_']):
                 setmessage('Company info saved', window)
+            currentcontactlogitem = fillcontactloglistbox(thecontactlog, window, currentcompany)
+            fillcontactlogrow(thecontactlog, currentcontactlogitem, window)
 
         elif event == '_CONTACTLOGLISTBOX_':
             fillcontactlogrow(thecontactlog, values['_CONTACTLOGLISTBOX_'][0][2],window)
