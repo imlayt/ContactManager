@@ -193,7 +193,8 @@ def fillcompanylistbox(table, window):
         window.FindElement('_COMPANYLISTBOX_').Update(companyboxlist)
         return companynumber
     except:
-        print('fillcompanylistbox FAILED')
+        # print('fillcompanylistbox FAILED')
+        window.FindElement('_COMPANYLISTBOX_').Update('')
         return None
 
 
@@ -215,7 +216,8 @@ def fillcontactlistbox(table,window, currentcompany):
         window.FindElement('_CONTACTLISTBOX_').Update(contactboxlist)
         return contactnumber
     except:
-        print('fillcontactlistbox FAILED')
+        # print('fillcontactlistbox FAILED')
+        window.FindElement('_CONTACTLISTBOX_').Update('')
         return None
 
 
@@ -237,7 +239,8 @@ def fillcontactloglistbox(table,window, currentcompany):
         window.FindElement('_CONTACTLOGLISTBOX_').Update(contactlogboxlist)
         return contactlognumber
     except:
-        print('fillcontactloglistbox FAILED')
+        # print('fillcontactloglistbox FAILED')
+        window.FindElement('_CONTACTLOGLISTBOX_').Update('')
         return None
 
 def clearcontactrow(window):
@@ -270,12 +273,11 @@ def clearcontactrow(window):
         # window.FindElement('_CONTACTCOMPANY_').Update(contactcompany)
 
         window.FindElement('_CONTACTCOMPANY_').Update('')
-
         window.Refresh()
 
         return True
     except:
-        print('fillcontact FAILED')
+        print('clearcontactrow FAILED')
         return False
 
 
@@ -293,7 +295,7 @@ def fillcontactrow(table, contactnumber, window):
         contactrow = table.readrows(sqlstring, contactnumber)
 
         window.FindElement('_CONTACTNUMBER_').Update(contactrow[0][0])
-        window.FindElement('_CONTACTNAME_').Update(contactrow[0][1])
+        window.FindElement('_CONTACTNAME_').Update(contactrow[0][2] +', ' + contactrow[0][3])
         window.FindElement('_CONTACTLASTNAME_').Update(contactrow[0][2])
         window.FindElement('_CONTACTFIRSTNAME_').Update(contactrow[0][3])
         window.FindElement('_CONTACTJOBTITLE_').Update(contactrow[0][4])
@@ -309,6 +311,7 @@ def fillcontactrow(table, contactnumber, window):
         sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
         contactcompany = table.readrows(sqlstring, contactrow[0][5])
         window.FindElement('_CONTACTCOMPANY_').Update(contactcompany[0][0])
+
 
         window.Refresh()
 
@@ -338,7 +341,8 @@ def fillactionitemlistbox(table,window, currentcompany):
 
         return actionitemnumber
     except:
-        print('fillactionitemlistbox FAILED')
+        # print('fillactionitemlistbox FAILED')
+        window.FindElement('_ACTIONITEMLISTBOX_').Update('')
         return None
 
 
@@ -857,12 +861,7 @@ def getcontactlogrow(values):
         contactlogrow.append(values['_CONTACTLOGCOMPANYID_'])
 
     contactlogrow.append(values['_CONTACTLOGCONTACT_'])
-
-    if len(values['_CONTACTLOGDATETIME_']) == 0:
-        contactlogrow.append(f'{datetime.now():%Y-%m-%d %H:%M}')
-    else:
-        contactlogrow.append(values['_CONTACTLOGDATETIME_'])
-
+    contactlogrow.append(f'{datetime.now():%Y-%m-%d %H:%M}')
     contactlogrow.append(values['_CONTACTLOGPURPOSE_'])
     contactlogrow.append(values['_CONTACTLOGOUTCOME_'])
     contactlogrow.append(values['_CONTACTLOGFOLLOWUP_'])
@@ -902,7 +901,8 @@ def savecontactlogrow(table, contactlogrow, thecontactlog=None):
     contactlogrow.append(contactlogrow[0])
     # print('companyrow => ', companyrow)
     if table.updaterow(sqlstring, contactlogrow):
-        sg.Popup('Saved company row data')
+        # sg.Popup('Saved contact log row data')
+        pass
     else:
         sg.Popup('FAILED to save contact log row data')
 
@@ -981,7 +981,7 @@ def main():
 
     contacttabcol2_layout = [[sg.Text('Contact Details', background_color='#d2d2df', justification='center', size=(60, 1))],
                              [sg.Text('Name', justification='right', size=(20,1)),
-                              sg.InputText(key='_CONTACTNAME_', size=(40, 1))],
+                              sg.InputText(key='_CONTACTNAME_', size=(40, 1), disabled=True)],
                              [sg.Text('Last Name', justification='right', size=(20, 1)),
                               sg.InputText(key='_CONTACTLASTNAME_', size=(40, 1))],
                              [sg.Text('First Name', justification='right', size=(20, 1)),
@@ -990,7 +990,7 @@ def main():
                               sg.InputText(key='_CONTACTJOBTITLE_', size=(40, 1))],
                              [sg.Text('Company', justification='right', size=(20, 1)),
                               sg.InputText(key='_CONTACTCOMPANYID_', visible=False),
-                              sg.InputText(key='_CONTACTCOMPANY_', size=(40, 1))],
+                              sg.InputText(key='_CONTACTCOMPANY_', size=(40, 1), disabled=True)],
                              [sg.Text('Work Phone', justification='right', size=(20, 1)),
                               sg.InputText(key='_CONTACTWORKPHONE_', size=(40, 1))],
                              [sg.Text('Cell Phone', justification='right', size=(20, 1)),
@@ -1016,17 +1016,17 @@ def main():
 
     actionitemlisttabcol2_layout = [[sg.T('Company', size=(25, 1)),
                                      sg.InputText(key='_ACTIONITEMLISTCOMPANYID_', visible=False),
-                                     sg.In(key='_ACTIONITEMLISTCOMPANYNAME_', size=(40, 1))],
+                                     sg.In(key='_ACTIONITEMLISTCOMPANYNAME_', size=(40, 1), disabled=True)],
                                     [sg.T('Status', size=(25, 1)),
                                      sg.In(key='_ACTIONITEMLISTSTATUS_', size=(40, 1))],
                                     [sg.T('Created', size=(25, 1)),
-                                     sg.In(key='_ACTIONITEMLISTCREATED_', size=(35, 1)),
+                                     sg.In(key='_ACTIONITEMLISTCREATED_', size=(35, 1), disabled=True),
                                      sg.CalendarButton('Cal', target='_ACTIONITEMLISTCREATED_')],
                                     [sg.T('Due Date', size=(25, 1)),
-                                     sg.In(key='_ACTIONITEMLISTDUEDATE', size=(35, 1)),
+                                     sg.In(key='_ACTIONITEMLISTDUEDATE', size=(35, 1), disabled=True),
                                      sg.CalendarButton('Cal', target='_ACTIONITEMLISTDUEDATE')],
                                     [sg.T('Status Date', size=(25, 1)),
-                                     sg.In(key='_ACTIONITEMLISTSTATUSDATE_', size=(35, 1)),
+                                     sg.In(key='_ACTIONITEMLISTSTATUSDATE_', size=(35, 1), disabled=True),
                                      sg.CalendarButton('Cal', target='_ACTIONITEMLISTSTATUSDATE_')],
                                     [sg.T('Action Item', size=(10, 1)),
                                      sg.Multiline(key='_ACTIONITEMLISTACTIONITEM_', size=(55, 10))],
@@ -1041,12 +1041,11 @@ def main():
 
     contactlogtabcol2_layout = [[sg.T('Company', size=(25, 1)),
                                  sg.InputText(key='_CONTACTLOGCOMPANYID_', visible=False),
-                                 sg.In(key='_CONTACTLOGCOMPANY_', size=(40, 1))],
+                                 sg.In(key='_CONTACTLOGCOMPANY_', size=(40, 1), disabled=True)],
                                 [sg.T('Contact', size=(25, 1)),
                                  sg.In(key='_CONTACTLOGCONTACT_', size=(40, 1))],
                                 [sg.T('Date/Time', size=(25, 1)),
-                                 sg.In(key='_CONTACTLOGDATETIME_', size=(35, 1)),
-                                 sg.CalendarButton('Cal', target='_CONTACTLOGDATETIME_')],
+                                 sg.In(key='_CONTACTLOGDATETIME_', size=(40, 1), disabled=True)],
                                 [sg.T('Purpose', size=(25, 1)),
                                  sg.In(key='_CONTACTLOGPURPOSE_', size=(40, 1))],
                                 [sg.T('Outcome', size=(10, 1)),
@@ -1055,7 +1054,7 @@ def main():
                                  sg.Multiline(key='_CONTACTLOGFOLLOWUP_', size=(55, 10))]
                                 ]
 
-    companytabcol1_layout = [[sg.Listbox(companylistbox, size=(40, 15), key='_COMPANYLISTBOX_', enable_events=True)],
+    companytabcol1_layout = [[sg.Listbox(companylistbox, size=(40, 25), key='_COMPANYLISTBOX_', enable_events=True)],
                              [sg.In(key='_COMPANYNUMBER_', size=(4, 1),disabled=True, visible=False)]
                              ]
 
