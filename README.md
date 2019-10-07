@@ -1,4 +1,4 @@
-# ContactManager
+# _ContactManager_
 A lightweight contact manager with Sqlite3 storage and PySimpleGUI front end.
 
 This application is a learning project focused on three things:
