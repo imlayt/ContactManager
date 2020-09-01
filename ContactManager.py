@@ -68,7 +68,7 @@ class ContactTable:
                 curr.execute(sqlstring)
             else:
                 # sg.Popup('readrows sqlvaluelist is NOT None',sqlstring, sqlvaluelist )
-                # print('readrows cur.execute =>', sqlstring, ((sqlvaluelist),))
+                print('readrows cur.execute =>', sqlstring, ((sqlvaluelist),))
                 curr.execute(sqlstring, (sqlvaluelist,))
 
             # print('readrows curr.execute succeeded')
@@ -251,7 +251,6 @@ def clearcontactrow(window):
     :param window:
     :return: True/False
     """
-    sqlstring = 'SELECT * from Contact WHERE ID = ? ;'
 
     try:
         window.FindElement('_CONTACTNUMBER_').Update('')
@@ -321,12 +320,12 @@ def fillcontactrow(table, contactnumber, window):
         print('fillcontactrow FAILED')
         return False
 
-def fillactionitemlistbox(table,window, currentcompany):
+def fillactionitemlistbox(table, window, currentcompany):
     """
 
-    :param table:
-    :param window:
-    :param currentcompany:
+    :param: table:
+    :param: window:
+    :param: currentcompany:
     :return:
     """
     sqlstr = 'SELECT CreatedDate, ActionItem, ID FROM ActionItemList where CompanyID = ? order by CreatedDate;'
@@ -512,19 +511,20 @@ def fillcontactlogrow(table, contactlognumber, window):
     sqlstring = 'SELECT * from ContactLog WHERE ID = ? ; '
 
     try:
-        contactlogrow = table.readrows(sqlstring, contactlognumber)
-        # print('contactlogrow => ', contactlogrow)
-        window.FindElement('_CONTACTLOGNUMBER_').Update(contactlogrow[0][0])
-        window.FindElement('_CONTACTLOGCOMPANYID_').Update(contactlogrow[0][1])
-        window.FindElement('_CONTACTLOGCONTACT_').Update(contactlogrow[0][2])
-        window.FindElement('_CONTACTLOGDATETIME_').Update(contactlogrow[0][3])
-        window.FindElement('_CONTACTLOGPURPOSE_').Update(contactlogrow[0][4])
-        window.FindElement('_CONTACTLOGOUTCOME_').Update(contactlogrow[0][5])
-        window.FindElement('_CONTACTLOGFOLLOWUP_').Update(contactlogrow[0][6])
+        if contactlognumber is not None:
+            contactlogrow = table.readrows(sqlstring, contactlognumber)
+            # print('contactlogrow => ', contactlogrow)
+            window.FindElement('_CONTACTLOGNUMBER_').Update(contactlogrow[0][0])
+            window.FindElement('_CONTACTLOGCOMPANYID_').Update(contactlogrow[0][1])
+            window.FindElement('_CONTACTLOGCONTACT_').Update(contactlogrow[0][2])
+            window.FindElement('_CONTACTLOGDATETIME_').Update(contactlogrow[0][3])
+            window.FindElement('_CONTACTLOGPURPOSE_').Update(contactlogrow[0][4])
+            window.FindElement('_CONTACTLOGOUTCOME_').Update(contactlogrow[0][5])
+            window.FindElement('_CONTACTLOGFOLLOWUP_').Update(contactlogrow[0][6])
 
-        sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
-        contactlogrowcompany = table.readrows(sqlstring, contactlogrow[0][1])
-        window.FindElement('_CONTACTLOGCOMPANY_').Update(contactlogrowcompany[0][0])
+            sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
+            contactlogrowcompany = table.readrows(sqlstring, contactlogrow[0][1])
+            window.FindElement('_CONTACTLOGCOMPANY_').Update(contactlogrowcompany[0][0])
 
         window.Refresh()
     except:
@@ -571,10 +571,7 @@ def getcontactrow(values):
 
     contactrow.append(values['_CONTACTNUMBER_'])
 
-    if len(values['_CONTACTNAME_']) > 0:
-        contactrow.append(values['_CONTACTNAME_'])
-    else:
-        contactrow.append(values['_CONTACTLASTNAME_'] + ', ' + values['_CONTACTFIRSTNAME_'])
+    contactrow.append(values['_CONTACTLASTNAME_'] + ', ' + values['_CONTACTFIRSTNAME_'])
 
     contactrow.append(values['_CONTACTLASTNAME_'])
     contactrow.append(values['_CONTACTFIRSTNAME_'])
