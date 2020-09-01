@@ -20,22 +20,22 @@ mediumgreen2 = '#00aaaa'  # color used by PySimpleGUIs
 
 class ContactTable:
     def __init__(self, connection, datatable):
-        '''
+        """
 
         :param connection:
         :param datatable:
-        '''
+        """
         self.conn = connection
         self.datatable = datatable
     pass
 
     def createrow(self, sqlstring, rowdata):
-        '''
+        """
 
         :param sqlstring:
         :param rowdata:
         :return: True if successful  else False
-        '''
+        """
 
         try:
             curr = self.conn.cursor()
@@ -51,13 +51,13 @@ class ContactTable:
             print('createrow FAILED(', rowdata, ')')
             return False
 
-    def readrows(self,sqlstring,sqlvaluelist=None):
-        '''
+    def readrows(self, sqlstring, sqlvaluelist=None):
+        """
 
         :param sqlstring:
         :param sqlvaluelist: values to be inserted into the sqlstring when the cursor is executed
         :return: list containing 1 or more rows or None
-        '''
+        """
 
         try:
             curr = self.conn.cursor()
@@ -80,12 +80,12 @@ class ContactTable:
             return None
 
     def updaterow(self, sqlstring, rowdata):
-        '''
+        """
 
         :param sqlstring:
         :param rowdata:
         :return: True if successful else False
-        '''
+        """
 
         try:
             curr = self.conn.cursor()
@@ -102,11 +102,11 @@ class ContactTable:
             return False
 
     def deleterow(self,sqlstring):
-        '''
+        """
 
         :param sqlstring:
         :return: True if successful else False
-        '''
+        """
         pass
 
 def tableexists(datafile, datatable):
@@ -144,22 +144,22 @@ def validatedatafile(datafile):
 
 
 def setmessage(message, window):
-    '''
+    """
     :param window:
     :param message:
     :return:
-    '''
+    """
     print('new message => ', message)
     window.FindElement('_MESSAGEAREA_').Update(message)
     window.Refresh()
 
 
 def db_connection(db_file):
-    '''
+    """
 
     :param db_file:
     :return: connection if successful else return None
-    '''
+    """
     try:
         conn = sqlite3.connect(db_file)
         print("sqlite3 version=", sqlite3.version)
@@ -170,19 +170,19 @@ def db_connection(db_file):
 
 
 def fillscreen(window, companyid=0, contactid=0):
-    '''
+    """
 
     :param window:
     :param companyid=0: zero means return the first company (for startup and following deletions)
     :param contactid=0: zero means return the first contact (for startup and following deletions)
     :return:
-    '''
+    """
 
 def fillcompanylistbox(table, window):
-    '''
+    """
 
     :return: True/False
-    '''
+    """
     sqlstr = 'SELECT CompanyName, ID FROM Company order by CompanyName;'
 
     try:
@@ -199,13 +199,13 @@ def fillcompanylistbox(table, window):
 
 
 def fillcontactlistbox(table,window, currentcompany):
-    '''
+    """
 
     :param table:
     :param window:
     :param currentcompany:
     :return:
-    '''
+    """
     sqlstr = 'SELECT ContactName, ID FROM Contact where CompanyID = ? order by ContactName;'
 
     try:
@@ -221,14 +221,14 @@ def fillcontactlistbox(table,window, currentcompany):
         return None
 
 
-def fillcontactloglistbox(table,window, currentcompany):
-    '''
+def fillcontactloglistbox(table, window, currentcompany):
+    """
 
     :param table:
     :param window:
     :param currentcompany:
     :return:
-    '''
+    """
     sqlstr = 'SELECT DateTime, Purpose, ID FROM ContactLog where CompanyID = ? order by DateTime;'
 
     try:
@@ -244,13 +244,13 @@ def fillcontactloglistbox(table,window, currentcompany):
         return None
 
 def clearcontactrow(window):
-    '''
+    """
 
     :param table:
     :param contactnumber:
     :param window:
     :return: True/False
-    '''
+    """
     sqlstring = 'SELECT * from Contact WHERE ID = ? ;'
 
     try:
@@ -282,20 +282,20 @@ def clearcontactrow(window):
 
 
 def fillcontactrow(table, contactnumber, window):
-    '''
+    """
 
     :param table:
     :param contactnumber:
     :param window:
     :return: True/False
-    '''
+    """
     sqlstring = 'SELECT * from Contact WHERE ID = ? ;'
 
     try:
         contactrow = table.readrows(sqlstring, contactnumber)
 
         window.FindElement('_CONTACTNUMBER_').Update(contactrow[0][0])
-        window.FindElement('_CONTACTNAME_').Update(contactrow[0][2] +', ' + contactrow[0][3])
+        window.FindElement('_CONTACTNAME_').Update(contactrow[0][1])
         window.FindElement('_CONTACTLASTNAME_').Update(contactrow[0][2])
         window.FindElement('_CONTACTFIRSTNAME_').Update(contactrow[0][3])
         window.FindElement('_CONTACTJOBTITLE_').Update(contactrow[0][4])
@@ -322,13 +322,13 @@ def fillcontactrow(table, contactnumber, window):
         return False
 
 def fillactionitemlistbox(table,window, currentcompany):
-    '''
+    """
 
     :param table:
     :param window:
     :param currentcompany:
     :return:
-    '''
+    """
     sqlstr = 'SELECT CreatedDate, ActionItem, ID FROM ActionItemList where CompanyID = ? order by CreatedDate;'
 
     try:
@@ -347,13 +347,13 @@ def fillactionitemlistbox(table,window, currentcompany):
 
 
 def fillactionitemrow(table, actionitemnumber, window):
-    '''
+    """
 
     :param table:
     :param actionitemnumber:
     :param window:
     :return: True/False
-    '''
+    """
     sqlstring = 'SELECT * from ActionItemList WHERE ID = ? ;'
 
     try:
@@ -380,13 +380,13 @@ def fillactionitemrow(table, actionitemnumber, window):
 
 
 def clearactionitemrow(window):
-    '''
+    """
 
     :param table:
     :param actionitemnumber:
     :param window:
     :return: True/False
-    '''
+    """
 
     try:
         window.FindElement('_ACTIONITEMNUMBER_').Update('')
@@ -407,11 +407,11 @@ def clearactionitemrow(window):
 
 
 def getactionitemrow(values):
-    '''
+    """
 
     :param values:
     :return: list of values representing a row in the actionitem table
-    '''
+    """
     actionitemrow = []
 
     actionitemrow.append(values['_ACTIONITEMNUMBER_'])
@@ -436,15 +436,15 @@ def getactionitemrow(values):
 
 
 def saveactionitemrow(table, actionitemrow, theactionitem=None):
-    '''
+    """
 
     :param table:
     :param companyrow:
     :param thecompany:
     :return:
-    '''
+    """
 
-    sqlstring = '''
+    sqlstring = """
     UPDATE ActionItemList SET 
     ID=?, 
     CompanyID = ?,
@@ -456,7 +456,7 @@ def saveactionitemrow(table, actionitemrow, theactionitem=None):
     StatusDate = ?
 
     WHERE ID = ?
-    '''
+    """
     # print('actionitemrow[0] =>', actionitemrow[0])
     actionitemrow.append(actionitemrow[0])
     # print('actionitemrow => ', actionitemrow)
@@ -468,15 +468,15 @@ def saveactionitemrow(table, actionitemrow, theactionitem=None):
 
 
 def newactionitemrow(table, actionitemrow, theactionitem=None):
-    '''
+    """
 
     :param table:
     :param companyrow:
     :param thecompany:
     :return:
-    '''
+    """
 
-    sqlstring = '''
+    sqlstring = """
     INSERT INTO ActionItemList (  
     CompanyID,
     CreatedDate,
@@ -487,7 +487,7 @@ def newactionitemrow(table, actionitemrow, theactionitem=None):
     StatusDate )
 
     VALUES( ?, ?, ?, ?, ?, ?, ? )
-    '''
+    """
 
     newactioniteminfo = actionitemrow[1:]
 
@@ -502,13 +502,13 @@ def newactionitemrow(table, actionitemrow, theactionitem=None):
 
 
 def fillcontactlogrow(table, contactlognumber, window):
-    '''
+    """
 
     :param table:
     :param contactlognumber:
     :param window:
     :return: True/False
-    '''
+    """
     sqlstring = 'SELECT * from ContactLog WHERE ID = ? ; '
 
     try:
@@ -534,13 +534,13 @@ def fillcontactlogrow(table, contactlognumber, window):
 
 
 def clearcontactlogrow(window):
-    '''
+    """
 
     :param table:
     :param contactlognumber:
     :param window:
     :return: True/False
-    '''
+    """
 
     try:
         window.FindElement('_CONTACTLOGNUMBER_').Update('')
@@ -561,15 +561,21 @@ def clearcontactlogrow(window):
 
 
 def getcontactrow(values):
-    '''
+    """
 
     :param values:
     :return: list of values representing a row in the contact table
-    '''
+    """
     contactrow = []
 
+
     contactrow.append(values['_CONTACTNUMBER_'])
-    contactrow.append(values['_CONTACTNAME_'])
+
+    if len(values['_CONTACTNAME_']) > 0:
+        contactrow.append(values['_CONTACTNAME_'])
+    else:
+        contactrow.append(values['_CONTACTLASTNAME_'] + ', ' + values['_CONTACTFIRSTNAME_'])
+
     contactrow.append(values['_CONTACTLASTNAME_'])
     contactrow.append(values['_CONTACTFIRSTNAME_'])
     contactrow.append(values['_CONTACTJOBTITLE_'])
@@ -592,15 +598,15 @@ def getcontactrow(values):
 
 
 def newcontactrow(table, contactrow):
-    '''
+    """
 
     :param table:
     :param companyrow:
     :param thecompany:
     :return:
-    '''
+    """
 
-    sqlstring = '''
+    sqlstring = """
     INSERT INTO Contact( 
     ContactName,
     LastName,
@@ -615,7 +621,7 @@ def newcontactrow(table, contactrow):
     Picture,
     LastUpdated )
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    '''
+    """
 
     newcontactinfo = contactrow[1:]
 
@@ -629,15 +635,15 @@ def newcontactrow(table, contactrow):
 
 
 def savecontactrow(table, contactrow, thecontact=None):
-    '''
+    """
 
     :param table:
     :param companyrow:
     :param thecompany:
     :return:
-    '''
+    """
 
-    sqlstring = '''
+    sqlstring = """
     UPDATE Contact SET 
     ID=?, 
     ContactName = ?,
@@ -654,7 +660,7 @@ def savecontactrow(table, contactrow, thecontact=None):
     LastUpdated = ?
 
     WHERE ID = ?
-    '''
+    """
     # print('contactrow[0] =>', contactrow[0])
     contactrow.append(contactrow[0])
     # print('contactrow => ', contactrow)
@@ -665,16 +671,16 @@ def savecontactrow(table, contactrow, thecontact=None):
         sg.Popup('FAILED to save contact row data')
 
 
-def savecontactrow(table, contactrow, thecontact=None):
-    '''
+def savecontactrow2(table, contactrow, thecontact=None):
+    """
 
     :param table:
-    :param companyrow:
-    :param thecompany:
+    :param contactrow:
+    :param thecontact:
     :return:
-    '''
+    """
 
-    sqlstring = '''
+    sqlstring = """
     UPDATE Contact SET 
     ID=?, 
     ContactName = ?,
@@ -691,7 +697,7 @@ def savecontactrow(table, contactrow, thecontact=None):
     LastUpdated = ?
      
     WHERE ID = ?
-    '''
+    """
     # print('contactrow[0] =>', contactrow[0])
     contactrow.append(contactrow[0])
     # print('contactrow => ', contactrow)
@@ -703,13 +709,13 @@ def savecontactrow(table, contactrow, thecontact=None):
         
 
 def fillcompanyrow(table, companynumber, window):
-    '''
+    """
 
     :param table:
     :param companynumber:
     :param window:
     :return:
-    '''
+    """
     sqlstring = 'SELECT * from Company WHERE ID = ? ; '
 
     try:
@@ -735,11 +741,11 @@ def fillcompanyrow(table, companynumber, window):
 
 
 def getcompanyrow(values):
-    '''
+    """
 
     :param values:
     :return: list of values representing a row in the company table
-    '''
+    """
     companyrow = []
 
     companyrow.append(values['_COMPANYNUMBER_'])
@@ -757,15 +763,15 @@ def getcompanyrow(values):
 
 
 def savecompanyrow(table, companyrow, thecompany=None):
-    '''
+    """
 
     :param table:
     :param companyrow:
     :param thecompany:
     :return:
-    '''
+    """
 
-    sqlstring = '''
+    sqlstring = """
     UPDATE Company SET 
     ID=?, 
     CompanyName = ?,
@@ -778,7 +784,7 @@ def savecompanyrow(table, companyrow, thecompany=None):
     Notes = ?,
     Phone = ? 
     WHERE ID = ?
-    '''
+    """
     # print('companyrow[0] =>', companyrow[0])
     companyrow.append(companyrow[0])
     # print('companyrow => ', companyrow)
@@ -790,19 +796,19 @@ def savecompanyrow(table, companyrow, thecompany=None):
 
 
 def newcompanyrow(table, companyrow):
-    '''
+    """
 
     :param table:
     :param companyrow:
     :param thecompany:
     :return: True/False
-    '''
+    """
 
     newcompanyinfo = companyrow[1:]
     # print('companyrow => ', companyrow)
     # print('newcompanyinfo => ', newcompanyinfo)
 
-    sqlstring = '''
+    sqlstring = """
     INSERT into Company (
     CompanyName,
     WebAddress,
@@ -814,7 +820,7 @@ def newcompanyrow(table, companyrow):
     Notes, 
     Phone)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    '''
+    """
 
     if table.createrow(sqlstring, newcompanyinfo):
         # sg.Popup('Created company row')
@@ -825,13 +831,11 @@ def newcompanyrow(table, companyrow):
 
 
 def clearcompanyrow(window):
-    '''
+    """
 
-    :param table:
-    :param companynumber:
     :param window:
     :return:
-    '''
+    """
 
     window.FindElement('_COMPANYNUMBER_').Update('')
     window.FindElement('_COMPANYNAME_').Update('')
@@ -846,11 +850,11 @@ def clearcompanyrow(window):
 
 
 def getcontactlogrow(values):
-    '''
+    """
 
     :param values:
     :return: list of values representing a row in the contactlog table
-    '''
+    """
     contactlogrow = []
 
     contactlogrow.append(values['_CONTACTLOGNUMBER_'])
@@ -878,15 +882,15 @@ def getcontactlogrow(values):
 
 
 def savecontactlogrow(table, contactlogrow, thecontactlog=None):
-    '''
+    """
 
     :param table:
     :param contactlogrow:
     :param thecontactlog:
     :return:
-    '''
+    """
 
-    sqlstring = '''
+    sqlstring = """
     UPDATE ContactLog SET 
     ID=?, 
     CompanyID = ?,
@@ -896,7 +900,7 @@ def savecontactlogrow(table, contactlogrow, thecontactlog=None):
     Outcome = ?,
     FollowUp = ?
     WHERE ID = ?
-    '''
+    """
     # print('companyrow[0] =>', companyrow[0])
     contactlogrow.append(contactlogrow[0])
     # print('companyrow => ', companyrow)
@@ -909,15 +913,15 @@ def savecontactlogrow(table, contactlogrow, thecontactlog=None):
 
 
 def newcontactlogrow(table, contactlogrow):
-    '''
+    """
 
     :param table:
     :param contactlogrow:
     :param thecontactlog:
     :return:
-    '''
+    """
 
-    sqlstring = '''
+    sqlstring = """
     INSERT INTO ContactLog ( 
     CompanyID,
     ContactID,
@@ -926,7 +930,7 @@ def newcontactlogrow(table, contactlogrow):
     Outcome,
     FollowUp )
     VALUES ( ?, ?, ?, ?, ?, ? )
-    '''
+    """
 
     newcontactloginfo = contactlogrow[1:]
 
@@ -939,10 +943,11 @@ def newcontactlogrow(table, contactlogrow):
 
 
 def main():
-    '''
+    """
 
     :return:
-    '''
+    """
+    global fileinfo, thecontactlog, theactionitemlist, thecontact, thecompany
     actionitemlistbox = []
     contactlistbox = []
     companylistbox = []
@@ -1158,10 +1163,10 @@ def main():
         elif event == '_SAVECONTACT_':
             # sg.Popup('_SAVECONTACT_')
             if len(values['_CONTACTNUMBER_']) == 0:
-                if newcontactrow( thecontact,getcontactrow(values)):
+                if newcontactrow(thecontact, getcontactrow(values)):
                     currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
                     setmessage('New contact added', window)
-            elif savecontactrow(thecontact,getcontactrow(values),values['_CONTACTNUMBER_']):
+            elif savecontactrow(thecontact,getcontactrow(values), values['_CONTACTNUMBER_']):
                 setmessage('Contact info saved', window)
             currentcontact = fillcontactlistbox(thecontact, window, currentcompany)
             fillcontactrow(thecontact, currentcontact, window)
@@ -1183,7 +1188,7 @@ def main():
             currentactionitem = fillactionitemlistbox(theactionitemlist, window, currentcompany)
             fillactionitemrow(theactionitemlist, currentactionitem, window)
         elif event == '_ACTIONITEMLISTBOX_':
-            fillactionitemrow(theactionitemlist, values['_ACTIONITEMLISTBOX_'][0][2],window)
+            fillactionitemrow(theactionitemlist, values['_ACTIONITEMLISTBOX_'][0][2], window)
 
         elif event == '_NEWCONTACTLOGITETM_':
             clearcontactlogrow(window)
@@ -1204,6 +1209,6 @@ def main():
 
 # ##########################################
 # execute the main function
-if __name__=="__main__":
+if __name__ == "__main__":
     # execute only if run as a script
     main()
