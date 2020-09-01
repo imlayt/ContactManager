@@ -68,7 +68,7 @@ class ContactTable:
                 curr.execute(sqlstring)
             else:
                 # sg.Popup('readrows sqlvaluelist is NOT None',sqlstring, sqlvaluelist )
-                print('readrows cur.execute =>', sqlstring, ((sqlvaluelist),))
+                # print('readrows cur.execute =>', sqlstring, ((sqlvaluelist),))
                 curr.execute(sqlstring, (sqlvaluelist,))
 
             # print('readrows curr.execute succeeded')
@@ -291,25 +291,26 @@ def fillcontactrow(table, contactnumber, window):
     sqlstring = 'SELECT * from Contact WHERE ID = ? ;'
 
     try:
-        contactrow = table.readrows(sqlstring, contactnumber)
+        if contactnumber is not None:
+            contactrow = table.readrows(sqlstring, contactnumber)
 
-        window.FindElement('_CONTACTNUMBER_').Update(contactrow[0][0])
-        window.FindElement('_CONTACTNAME_').Update(contactrow[0][1])
-        window.FindElement('_CONTACTLASTNAME_').Update(contactrow[0][2])
-        window.FindElement('_CONTACTFIRSTNAME_').Update(contactrow[0][3])
-        window.FindElement('_CONTACTJOBTITLE_').Update(contactrow[0][4])
-        window.FindElement('_CONTACTCOMPANYID_').Update(contactrow[0][5])
-        window.FindElement('_CONTACTWORKPHONE_').Update(contactrow[0][6])
-        window.FindElement('_CONTACTCELLPHONE_').Update(contactrow[0][7])
-        window.FindElement('_CONTACTWORKEMAIL_').Update(contactrow[0][8])
-        window.FindElement('_CONTACTPERSONALEMAIL_').Update(contactrow[0][9])
-        window.FindElement('_CONTACTPICTURE_').Update(contactrow[0][11])
-        window.FindElement('_CONTACTLASTUPDATED_').Update(contactrow[0][12])
-        window.FindElement('_CONTACTNOTES_').Update(contactrow[0][10])
+            window.FindElement('_CONTACTNUMBER_').Update(contactrow[0][0])
+            window.FindElement('_CONTACTNAME_').Update(contactrow[0][1])
+            window.FindElement('_CONTACTLASTNAME_').Update(contactrow[0][2])
+            window.FindElement('_CONTACTFIRSTNAME_').Update(contactrow[0][3])
+            window.FindElement('_CONTACTJOBTITLE_').Update(contactrow[0][4])
+            window.FindElement('_CONTACTCOMPANYID_').Update(contactrow[0][5])
+            window.FindElement('_CONTACTWORKPHONE_').Update(contactrow[0][6])
+            window.FindElement('_CONTACTCELLPHONE_').Update(contactrow[0][7])
+            window.FindElement('_CONTACTWORKEMAIL_').Update(contactrow[0][8])
+            window.FindElement('_CONTACTPERSONALEMAIL_').Update(contactrow[0][9])
+            window.FindElement('_CONTACTPICTURE_').Update(contactrow[0][11])
+            window.FindElement('_CONTACTLASTUPDATED_').Update(contactrow[0][12])
+            window.FindElement('_CONTACTNOTES_').Update(contactrow[0][10])
 
-        sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
-        contactcompany = table.readrows(sqlstring, contactrow[0][5])
-        window.FindElement('_CONTACTCOMPANY_').Update(contactcompany[0][0])
+            sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
+            contactcompany = table.readrows(sqlstring, contactrow[0][5])
+            window.FindElement('_CONTACTCOMPANY_').Update(contactcompany[0][0])
 
 
         window.Refresh()
@@ -355,22 +356,25 @@ def fillactionitemrow(table, actionitemnumber, window):
     """
     sqlstring = 'SELECT * from ActionItemList WHERE ID = ? ;'
 
+    clearactionitemrow(window)
+
     try:
-        actionitemrow = table.readrows(sqlstring, actionitemnumber)
+        if actionitemnumber is not None:
+            actionitemrow = table.readrows(sqlstring, actionitemnumber)
 
-        window.FindElement('_ACTIONITEMNUMBER_').Update(actionitemrow[0][0])
-        window.FindElement('_ACTIONITEMLISTCOMPANYID_').Update(actionitemrow[0][1])
-        window.FindElement('_ACTIONITEMLISTCREATED_').Update(actionitemrow[0][2])
-        window.FindElement('_ACTIONITEMLISTDUEDATE').Update(actionitemrow[0][3])
-        window.FindElement('_ACTIONITEMLISTACTIONITEM_').Update(actionitemrow[0][4])
-        window.FindElement('_ACTIONITEMLISTNOTES_').Update(actionitemrow[0][5])
-        window.FindElement('_ACTIONITEMLISTSTATUS_').Update(actionitemrow[0][6])
-        window.FindElement('_ACTIONITEMLISTSTATUSDATE_').Update(actionitemrow[0][7])
+            window.FindElement('_ACTIONITEMNUMBER_').Update(actionitemrow[0][0])
+            window.FindElement('_ACTIONITEMLISTCOMPANYID_').Update(actionitemrow[0][1])
+            window.FindElement('_ACTIONITEMLISTCREATED_').Update(actionitemrow[0][2])
+            window.FindElement('_ACTIONITEMLISTDUEDATE').Update(actionitemrow[0][3])
+            window.FindElement('_ACTIONITEMLISTACTIONITEM_').Update(actionitemrow[0][4])
+            window.FindElement('_ACTIONITEMLISTNOTES_').Update(actionitemrow[0][5])
+            window.FindElement('_ACTIONITEMLISTSTATUS_').Update(actionitemrow[0][6])
+            window.FindElement('_ACTIONITEMLISTSTATUSDATE_').Update(actionitemrow[0][7])
 
-        sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
+            sqlstring = 'SELECT CompanyName from Company WHERE ID = ? ;'
 
-        actionitemcompany = table.readrows(sqlstring, actionitemrow[0][1])
-        window.FindElement('_ACTIONITEMLISTCOMPANYNAME_').Update(actionitemcompany[0][0])
+            actionitemcompany = table.readrows(sqlstring, actionitemrow[0][1])
+            window.FindElement('_ACTIONITEMLISTCOMPANYNAME_').Update(actionitemcompany[0][0])
 
         window.Refresh()
     except:
@@ -1036,7 +1040,7 @@ def main():
                                      sg.Multiline(key='_ACTIONITEMLISTNOTES_', size=(55, 10))]
                          ]
 
-    contactlogtabcol1_layout = [[sg.Listbox(contactloglistbox, size=(40, 5), key='_CONTACTLOGLISTBOX_',enable_events=True)],
+    contactlogtabcol1_layout = [[sg.Listbox(contactloglistbox, size=(40, 15), key='_CONTACTLOGLISTBOX_',enable_events=True)],
                                 [sg.In(key='_CONTACTLOGNUMBER_', size=(4, 1),disabled=True, visible=False),
                                  sg.Button('New Contact Log Item', key='_NEWCONTACTLOGITETM_'),
                                  sg.Button('Save Log Item', key='_SAVECONTACTLOG_')]]
